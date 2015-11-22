@@ -43,21 +43,29 @@ import javax.transaction.UserTransaction;
 import org.eclipse.persistence.queries.CursoredStream;
 
 /**
- * <p>"Records" provides all the CRUD features to manipulate, store, query POJOs
+ * <p>
+ * "Records" provides all the CRUD features to manipulate, store, query POJOs
  * from/to the database.</p>
- * <p>POJOs must extend DefaultRecord (or implement the interface Record).<br>
- * Fields are excluded from database using annotation RecordExclusion and 
+ * <p>
+ * POJOs must extend DefaultRecord (or implement the interface Record).<br>
+ * Fields are excluded from database using annotation RecordExclusion and
  * indexed using the annotation FieldIndexing.</p>
- * <p>@XmlRootElement is optional in the record extended class.</p>
- * <p>Records relies on a persistence unit to connect to the database, i.e. persistence.xml
- * must be configured accordingly. Please see the TEST resources to find examples
- * for several databases.</p>
- * <p>Multi-tenant is supported and is configured in the entity manager or the
+ * <p>
+ * @XmlRootElement is optional in the record extended class.</p>
+ * <p>
+ * Records relies on a persistence unit to connect to the database, i.e.
+ * persistence.xml must be configured accordingly. Please see the TEST resources
+ * to find examples for several databases.</p>
+ * <p>
+ * Multi-tenant is supported and is configured in the entity manager or the
  * entity manager factory.</p>
- * <p>The DefaultRecord class supports also a binary document to save images or other binary
- * files in the database as part of a record. Binary insertion in the database has been
- * preferred to keep coherence when manipulating data (versioning, backup, ...)</p>
- * <p>Links and queries are facilitated by fluent APIs.</p>
+ * <p>
+ * The DefaultRecord class supports also a binary document to save images or
+ * other binary files in the database as part of a record. Binary insertion in
+ * the database has been preferred to keep coherence when manipulating data
+ * (versioning, backup, ...)</p>
+ * <p>
+ * Links and queries are facilitated by fluent APIs.</p>
  *
  * @author Jean-Michel Tanguy
  */
@@ -92,20 +100,18 @@ public class Records {
      * @param em entity manager
      * @param utx user transaction
      */
-  //  public Records(EntityManager em, UserTransaction utx) {
-  //      mc = new DatabaseController(em, utx);
-  //  }
-
+    //  public Records(EntityManager em, UserTransaction utx) {
+    //      mc = new DatabaseController(em, utx);
+    //  }
     /**
      * Setting the controller with : container managed entity manager and
      * transactions (CMT). Resource must be JTA. Typically used within EJB.
      *
      * @param em entity manager
      */
- //   public Records(EntityManager em) {
- //       mc = new DatabaseController(em);
- //   }
-
+    //   public Records(EntityManager em) {
+    //       mc = new DatabaseController(em);
+    //   }
     /**
      * Setting the controller with : bean managed entity and entity transaction.
      * Resource can be JTA or Local Resource. Typically used in Java SE or unit
@@ -225,20 +231,23 @@ public class Records {
                     em.remove(em.getReference(RecordIndex.class, pk));
                 }
                 // mapping the index to the database
-                RecordIndex ri = new RecordIndex(pk);
-                switch (pm.getType(field.getType())) {
-                    case DATE:
-                        ri.setDate((Date) pm.getConverted(fieldValue));
-                        break;
-                    case STRING:
-                        ri.setValue((String) pm.getConverted(fieldValue));
-                        break;
-                    case NUMERIC:
-                        ri.setNumeric((BigDecimal) pm.getConverted(fieldValue));
-                        break;
+                Comparable converted = pm.getConverted(fieldValue);
+                if (converted != null) {
+                    RecordIndex ri = new RecordIndex(pk);
+                    switch (pm.getType(field.getType())) {
+                        case DATE:
+                            ri.setDate((Date) converted);
+                            break;
+                        case STRING:
+                            ri.setValue((String) converted);
+                            break;
+                        case NUMERIC:
+                            ri.setNumeric((BigDecimal) converted);
+                            break;
+                    }
+                    // saving
+                    em.persist(ri);
                 }
-                // saving
-                em.persist(ri);
             } catch (IllegalArgumentException | IllegalAccessException ex) {
                 // convet to runtime exception
                 throw new RuntimeException(ex);
@@ -363,6 +372,7 @@ public class Records {
         }
 
     }
+
     /*
      //-- KEPT AS KNOWLEDGE REFERENCE
      //-- single  query less efficient than batch remove 
@@ -452,7 +462,7 @@ public class Records {
     public void enableAudit(String user) {
         auditor = new AuditLogger(mc, user);
     }
-    
+
     /**
      * disabling audit for better performances
      */
@@ -463,10 +473,11 @@ public class Records {
     //--------------------------------------------------------------------------
     // Record internal
     //--------------------------------------------------------------------------
-    
     /**
      * listing "distinct" and sorted values from an index key
-     * @param key index key to query as defined in the FieldIndexing annotation (if not empty)
+     *
+     * @param key index key to query as defined in the FieldIndexing annotation
+     * (if not empty)
      * @return list of string of available values for the index
      */
     public List<String> getIndexList(String key) {
@@ -484,15 +495,16 @@ public class Records {
         }
         return list;
     }
-    
+
     /**
      * listing "distinct" and sorted values from an indexed field
+     *
      * @param targetClass class of the record with the indexed field
      * @param targetField indexed field
      * @return list of string of available values for the index
      */
-    public List<String> getIndexList(Class targetClass, String  targetField) {
-        String key =  targetClass.getName() + "." + targetField;
+    public List<String> getIndexList(Class targetClass, String targetField) {
+        String key = targetClass.getName() + "." + targetField;
         return getIndexList(key);
     }
 
@@ -523,6 +535,7 @@ public class Records {
 
     /**
      * removing parents and children
+     *
      * @param parentId record id
      * @param childId record id
      */

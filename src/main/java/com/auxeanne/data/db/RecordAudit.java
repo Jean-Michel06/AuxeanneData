@@ -91,7 +91,7 @@ public class RecordAudit implements Serializable {
     // mapping to default tenant column for master management
     @Column(name = "TENANT_ID", insertable = false, updatable = false)
     private String tenantId;
-
+    
     public String getTenantId() {
         return tenantId;
     }

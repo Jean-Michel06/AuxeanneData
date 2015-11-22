@@ -58,7 +58,7 @@ public class RecordWrapper implements Serializable {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "recordWrapper")
     private List<RecordIndex> recordIndexList;
- 
+
     private static final long serialVersionUID = 1L;
 
 
@@ -85,7 +85,7 @@ public class RecordWrapper implements Serializable {
     private List<RecordLink> referenceList;
     @OneToMany(mappedBy = "link", fetch = FetchType.LAZY)
     private List<RecordLink> linkList;
-        @Lob
+    @Lob
     @Column(name = "document_")
     private byte[] document;
 
@@ -207,6 +207,6 @@ public class RecordWrapper implements Serializable {
     public void setRecordIndexList(List<RecordIndex> recordIndexList) {
         this.recordIndexList = recordIndexList;
     }
-    
+
 }
 

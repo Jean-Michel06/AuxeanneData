@@ -25,13 +25,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.eclipse.persistence.annotations.Multitenant;
@@ -60,9 +58,6 @@ public class RecordType implements Serializable {
     @Basic(optional = false)
     @Column(name = "code_")
     private String code;
-    @Lob
-    @Column(name = "configuration_")
-    private String configuration;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "recordType")
     private List<RecordWrapper> recordList;
     
@@ -104,13 +99,6 @@ public class RecordType implements Serializable {
     }
 
 
-    public String getConfiguration() {
-        return configuration;
-    }
-
-    public void setConfiguration(String configuration) {
-        this.configuration = configuration;
-    }
 
     @XmlTransient
     public List<RecordWrapper> getRecordList() {

@@ -87,7 +87,7 @@ public class DatabaseController {
     /**
      * GSON Handler : using ISO 8601 date format
      */
-    protected final Gson gson = new GsonBuilder().setExclusionStrategies(new RecordlExclusionStrategy()).create();
+    protected final Gson gson = new GsonBuilder().setExclusionStrategies(new RecordExclusionStrategy()).create();
 
     /**
      * managed entity manager

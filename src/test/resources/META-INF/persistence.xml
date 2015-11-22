@@ -2,15 +2,13 @@
 <persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
   <persistence-unit name="JAVADB_EMBEDDED_TEST_PU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>com.auxeanne.api.data.db.Preference</class>
-    <class>com.auxeanne.api.data.db.RecordAudit</class>
-    <class>com.auxeanne.api.data.db.RecordIndex</class>
-    <class>com.auxeanne.api.data.db.RecordIndexField</class>
-    <class>com.auxeanne.api.data.db.RecordLink</class>
-    <class>com.auxeanne.api.data.db.RecordPath</class>
-    <class>com.auxeanne.api.data.db.RecordType</class>
-    <class>com.auxeanne.api.data.db.RecordWrapper</class>
-    <class>com.auxeanne.api.data.db.RecordIndexKey</class>
+    <class>com.auxeanne.data.db.Preference</class>
+    <class>com.auxeanne.data.db.RecordAudit</class>
+    <class>com.auxeanne.data.db.RecordIndex</class>
+    <class>com.auxeanne.data.db.RecordLink</class>
+    <class>com.auxeanne.data.db.RecordPath</class>
+    <class>com.auxeanne.data.db.RecordType</class>
+    <class>com.auxeanne.data.db.RecordWrapper</class>
     <properties>
       <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
       <property name="eclipselink.cache.type.default" value="Soft"/>
@@ -36,15 +34,15 @@
   </persistence-unit>
   <persistence-unit name="JAVADB_TEST_PU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>com.auxeanne.api.data.db.Preference</class>
-    <class>com.auxeanne.api.data.db.RecordAudit</class>
-    <class>com.auxeanne.api.data.db.RecordIndex</class>
-    <class>com.auxeanne.api.data.db.RecordIndexField</class>
-    <class>com.auxeanne.api.data.db.RecordLink</class>
-    <class>com.auxeanne.api.data.db.RecordPath</class>
-    <class>com.auxeanne.api.data.db.RecordType</class>
-    <class>com.auxeanne.api.data.db.RecordWrapper</class>
-    <class>com.auxeanne.api.data.db.RecordIndexKey</class>
+    <class>com.auxeanne.data.db.Preference</class>
+    <class>com.auxeanne.data.db.RecordAudit</class>
+    <class>com.auxeanne.data.db.RecordIndex</class>
+    <class>com.auxeanne.data.db.RecordIndexField</class>
+    <class>com.auxeanne.data.db.RecordLink</class>
+    <class>com.auxeanne.data.db.RecordPath</class>
+    <class>com.auxeanne.data.db.RecordType</class>
+    <class>com.auxeanne.data.db.RecordWrapper</class>
+    <class>com.auxeanne.data.db.RecordIndexKey</class>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
       <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
@@ -73,15 +71,15 @@
   </persistence-unit>
   <persistence-unit name="MYSQL_TEST_PU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>com.auxeanne.api.data.db.Preference</class>
-    <class>com.auxeanne.api.data.db.RecordAudit</class>
-    <class>com.auxeanne.api.data.db.RecordIndex</class>
-    <class>com.auxeanne.api.data.db.RecordIndexField</class>
-    <class>com.auxeanne.api.data.db.RecordLink</class>
-    <class>com.auxeanne.api.data.db.RecordPath</class>
-    <class>com.auxeanne.api.data.db.RecordType</class>
-    <class>com.auxeanne.api.data.db.RecordWrapper</class>
-    <class>com.auxeanne.api.data.db.RecordIndexKey</class>
+    <class>com.auxeanne.data.db.Preference</class>
+    <class>com.auxeanne.data.db.RecordAudit</class>
+    <class>com.auxeanne.data.db.RecordIndex</class>
+    <class>com.auxeanne.data.db.RecordIndexField</class>
+    <class>com.auxeanne.data.db.RecordLink</class>
+    <class>com.auxeanne.data.db.RecordPath</class>
+    <class>com.auxeanne.data.db.RecordType</class>
+    <class>com.auxeanne.data.db.RecordWrapper</class>
+    <class>com.auxeanne.data.db.RecordIndexKey</class>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
       <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
@@ -106,15 +104,15 @@
   </persistence-unit>
   <persistence-unit name="POSTGRES_TEST_PU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>com.auxeanne.api.data.db.Preference</class>
-    <class>com.auxeanne.api.data.db.RecordAudit</class>
-    <class>com.auxeanne.api.data.db.RecordIndex</class>
-    <class>com.auxeanne.api.data.db.RecordIndexField</class>
-    <class>com.auxeanne.api.data.db.RecordLink</class>
-    <class>com.auxeanne.api.data.db.RecordPath</class>
-    <class>com.auxeanne.api.data.db.RecordType</class>
-    <class>com.auxeanne.api.data.db.RecordWrapper</class>
-    <class>com.auxeanne.api.data.db.RecordIndexKey</class>
+    <class>com.auxeanne.data.db.Preference</class>
+    <class>com.auxeanne.data.db.RecordAudit</class>
+    <class>com.auxeanne.data.db.RecordIndex</class>
+    <class>com.auxeanne.data.db.RecordIndexField</class>
+    <class>com.auxeanne.data.db.RecordLink</class>
+    <class>com.auxeanne.data.db.RecordPath</class>
+    <class>com.auxeanne.data.db.RecordType</class>
+    <class>com.auxeanne.data.db.RecordWrapper</class>
+    <class>com.auxeanne.data.db.RecordIndexKey</class>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
       <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
@@ -139,15 +137,15 @@
   </persistence-unit>
   <persistence-unit name="SQL_SERVER_TEST_PU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>com.auxeanne.api.data.db.Preference</class>
-    <class>com.auxeanne.api.data.db.RecordAudit</class>
-    <class>com.auxeanne.api.data.db.RecordIndex</class>
-    <class>com.auxeanne.api.data.db.RecordIndexField</class>
-    <class>com.auxeanne.api.data.db.RecordLink</class>
-    <class>com.auxeanne.api.data.db.RecordPath</class>
-    <class>com.auxeanne.api.data.db.RecordType</class>
-    <class>com.auxeanne.api.data.db.RecordWrapper</class>
-    <class>com.auxeanne.api.data.db.RecordIndexKey</class>
+    <class>com.auxeanne.data.db.Preference</class>
+    <class>com.auxeanne.data.db.RecordAudit</class>
+    <class>com.auxeanne.data.db.RecordIndex</class>
+    <class>com.auxeanne.data.db.RecordIndexField</class>
+    <class>com.auxeanne.data.db.RecordLink</class>
+    <class>com.auxeanne.data.db.RecordPath</class>
+    <class>com.auxeanne.data.db.RecordType</class>
+    <class>com.auxeanne.data.db.RecordWrapper</class>
+    <class>com.auxeanne.data.db.RecordIndexKey</class>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
       <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
@@ -176,15 +174,15 @@
   </persistence-unit>
   <persistence-unit name="ORACLE_XE_TEST_PU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>com.auxeanne.api.data.db.Preference</class>
-    <class>com.auxeanne.api.data.db.RecordAudit</class>
-    <class>com.auxeanne.api.data.db.RecordIndex</class>
-    <class>com.auxeanne.api.data.db.RecordIndexField</class>
-    <class>com.auxeanne.api.data.db.RecordLink</class>
-    <class>com.auxeanne.api.data.db.RecordPath</class>
-    <class>com.auxeanne.api.data.db.RecordType</class>
-    <class>com.auxeanne.api.data.db.RecordWrapper</class>
-    <class>com.auxeanne.api.data.db.RecordIndexKey</class>
+    <class>com.auxeanne.data.db.Preference</class>
+    <class>com.auxeanne.data.db.RecordAudit</class>
+    <class>com.auxeanne.data.db.RecordIndex</class>
+    <class>com.auxeanne.data.db.RecordIndexField</class>
+    <class>com.auxeanne.data.db.RecordLink</class>
+    <class>com.auxeanne.data.db.RecordPath</class>
+    <class>com.auxeanne.data.db.RecordType</class>
+    <class>com.auxeanne.data.db.RecordWrapper</class>
+    <class>com.auxeanne.data.db.RecordIndexKey</class>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
       <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>

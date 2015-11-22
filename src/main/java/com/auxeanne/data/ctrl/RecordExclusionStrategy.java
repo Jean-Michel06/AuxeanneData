@@ -24,7 +24,7 @@ import com.google.gson.FieldAttributes;
  * 
  * @author Jean-Michel Tanguy
  */
-public class RecordlExclusionStrategy implements ExclusionStrategy {
+public class RecordExclusionStrategy implements ExclusionStrategy {
 
     @Override
     public boolean shouldSkipClass(Class<?> clazz) {
