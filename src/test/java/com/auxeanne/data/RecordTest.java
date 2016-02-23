@@ -75,7 +75,7 @@ public class RecordTest {
     }
 
     @Test
-    public void testCRUD() {
+    public void testCRUD() throws IllegalAccessException {
         for (String pu : PU.getPuList()) {
             System.out.println("\n== CRUD testing " + pu );
             crud(PU.getFactoryList().get(pu));
@@ -139,7 +139,7 @@ public class RecordTest {
         System.out.println("Batch REwrite : " + (end - start) + " ms ");
     }
 
-    private void crud(EntityManagerFactory target) {
+    private void crud(EntityManagerFactory target) throws IllegalAccessException {
         Records records = new Records(target);
 
         PersonRecord person = new PersonRecord();

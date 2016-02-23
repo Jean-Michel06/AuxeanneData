@@ -25,7 +25,7 @@ import java.util.Objects;
  *
  * @author Jean-Michel Tanguy
  */
-public abstract class DefaultRecord  implements Record, Serializable {
+public abstract class AbstractRecord  implements Record, Serializable {
 
     @FieldExclusion
     private transient Long id;
@@ -111,7 +111,7 @@ public abstract class DefaultRecord  implements Record, Serializable {
         //if (getClass() != obj.getClass()) {
         //    return false;
         //}
-        final DefaultRecord other = (DefaultRecord) obj;
+        final AbstractRecord other = (AbstractRecord) obj;
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }

@@ -15,13 +15,13 @@
  */
 package com.auxeanne.data.record;
 
-import com.auxeanne.data.DefaultRecord;
+import com.auxeanne.data.AbstractRecord;
 
 /**
  *
  * @author Jean-Michel Tanguy
  */
-public class SimpleRecord extends DefaultRecord {
+public class SimpleRecord extends AbstractRecord {
     
     String data;
 

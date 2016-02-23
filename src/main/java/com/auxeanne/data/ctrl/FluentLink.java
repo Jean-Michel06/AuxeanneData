@@ -104,7 +104,7 @@ public class FluentLink {
         public void save() {
             switch (action) {
                 case LINKING:
-                    link( records);
+                    link(records);
                     break;
                 case AS_PARENT:
                     addChild(records);
@@ -134,7 +134,6 @@ public class FluentLink {
 //        public void update() {
 //            link(false, records);
 //        }
-
         //----------------------------------------------------------------------
         // ParameterBuilder
         //----------------------------------------------------------------------
@@ -155,21 +154,23 @@ public class FluentLink {
 //            this.date = date;
 //            return this;
 //        }
-        
         @Override
         public PathBuilder setAttribute(Object parameter) {
             Comparable converted = pm.getConverted(parameter);
             numeric = null;
             date = null;
-            value=null;
-            
-            if (converted instanceof BigDecimal)
-                numeric = (BigDecimal)converted;
-            if (converted instanceof Date)
-                date = (Date)converted;
-            if (converted instanceof String) 
-                value = (String)converted;
-            
+            value = null;
+            if (converted != null) {
+                if (converted instanceof BigDecimal) {
+                    numeric = (BigDecimal) converted;
+                }
+                if (converted instanceof Date) {
+                    date = (Date) converted;
+                }
+                if (converted instanceof String) {
+                    value = (String) converted;
+                }
+            }
             return this;
         }
 
@@ -181,14 +182,24 @@ public class FluentLink {
             RecordLinkPK pk = new RecordLinkPK(reference.getId(), records[0].getId());
             RecordLink recordLink = mc.getTransactionEntityManager().find(RecordLink.class, pk);
             if (recordLink != null) {
-                if (recordLink.getNumeric()!=null)
+                if (recordLink.getNumeric() != null) {
                     return recordLink.getNumeric();
-                if (recordLink.getValue()!=null)
+                }
+                if (recordLink.getValue() != null) {
                     return recordLink.getValue();
-                if (recordLink.getDate()!=null)
+                }
+                if (recordLink.getDate() != null) {
                     return recordLink.getDate();
+                }
             }
             return null;
+        }
+
+        @Override
+        public boolean isAvailable() {
+            RecordLinkPK pk = new RecordLinkPK(reference.getId(), records[0].getId());
+            RecordLink recordLink = mc.getTransactionEntityManager().find(RecordLink.class, pk);
+            return (recordLink != null);
         }
 
 //        @Override
@@ -210,7 +221,6 @@ public class FluentLink {
 //            }
 //            return null;
 //        }
-
         //----------------------------------------------------------------------
         // internal link management
         //----------------------------------------------------------------------
@@ -409,8 +419,10 @@ public class FluentLink {
 
         /**
          * adding an attribute to a bidirectional link
-         * @param parameter any object converted as Date, BigDecimal or String, depending on what fits best
-         * @return Fluent Link 
+         *
+         * @param parameter any object converted as Date, BigDecimal or String,
+         * depending on what fits best. Null clears the attribute.
+         * @return Fluent Link
          */
         CreateBuilder setAttribute(Object parameter);
 
@@ -424,16 +436,26 @@ public class FluentLink {
 
         /**
          * retrieving the attribute of a bidirectional link (finalizing)
-         * @return Date, BigDecimal or String depending of the attribute
+         *
+         * @return Date, BigDecimal or String depending of the attribute or null
+         * is not attribute is set
          */
         Comparable getAttribute();
-        
+
+        /**
+         * checking if a link is set between records
+         *
+         * @return true is the link exists
+         */
+        boolean isAvailable();
+
     }
 
     static public interface ConnectionBuilder {
 
         /**
          * setting bidirectional link
+         *
          * @param record POJO to link to reference
          * @return Fluent Link
          */
@@ -441,20 +463,23 @@ public class FluentLink {
 
         /**
          * setting bidirectional links
+         *
          * @param records POJOs to link to the reference
-         * @return Fluent Link 
+         * @return Fluent Link
          */
         LinkBuilder with(Record... records);
 
         /**
          * setting hierarchical link
+         *
          * @param records children of the reference
-         * @return Fluent Link 
+         * @return Fluent Link
          */
         PathBuilder asParentOf(Record... records);
 
         /**
          * setting hierarchical link
+         *
          * @param records parents of the reference
          * @return Fluent Link
          */

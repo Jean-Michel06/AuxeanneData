@@ -86,13 +86,15 @@ public class FluentQuery {
         }
 
         @Override
-        public T find(long id) {
+        public T find(long id) throws IllegalAccessException {
             RecordWrapper record = mc.getTransactionEntityManager().find(RecordWrapper.class, id);
             try {
                 if (record != null) {
                     Class c = Class.forName(record.getRecordType().getCode());
                     if (referenceClass.isAssignableFrom(c)) {
                         return mc.getRecord(referenceClass, record);
+                    } else {
+                        throw new IllegalAccessException();
                     }
                 }
             } catch (ClassNotFoundException ex) {
@@ -245,6 +247,7 @@ public class FluentQuery {
         //----------------------------------------------------------------------
         @Override
         public List<T> getList() {
+            long startP = System.currentTimeMillis();
             ArrayList<T> list = new ArrayList<>();
             Query query;
             Path selectPath;
@@ -277,7 +280,10 @@ public class FluentQuery {
             if (maxResults != null) {
                 query.setMaxResults(maxResults);
             }
+            long startQ = System.currentTimeMillis();
             List<RecordWrapper> resultList = query.getResultList();
+            long endQ = System.currentTimeMillis();
+            long startC = System.currentTimeMillis();
             // converting
             resultList.stream().map((record) -> {
                 T model = mc.getRecord(referenceClass, record);
@@ -285,6 +291,9 @@ public class FluentQuery {
             }).forEach((model) -> {
                 list.add(model);
             });
+            long endC = System.currentTimeMillis();
+            long endP = System.currentTimeMillis();
+            System.out.println("Get List for "+list.size()+"    Total: "+(endP-startP)+"ms     Query: "+(endQ-startQ)+"ms  Convert: "+(endC-startC)+"ms");
             return list;
         }
 
@@ -575,7 +584,7 @@ public class FluentQuery {
         /**
          * get the first record from the query (finalizing the query)
          *
-         * @return first matching record for the query
+         * @return first matching record for the query or null if query is empty
          */
         T getFirst();
 
@@ -651,7 +660,7 @@ public class FluentQuery {
          * @param id database id
          * @return record from the database
          */
-        T find(long id);
+        T find(long id) throws IllegalAccessException;
 
     };
 

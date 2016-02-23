@@ -201,7 +201,7 @@ public class Records {
             });
         }
     }
-
+    
     /**
      * parsing record to extract indexed fields
      *
@@ -453,6 +453,17 @@ public class Records {
     public <T extends Record> QueryBuilder<T> query(Class<T> referenceClass) {
         return new FluentQuery.Builder<>(mc, referenceClass);
     }
+    
+    /**
+     * Gives the type of a record from its id.
+     * Main purpose is to check if the manipulated id has the correct type.
+     * @param id
+     * @return type name
+     */
+    public String getRecordType(Long id) {
+        return mc.getTransactionEntityManager().find(RecordWrapper.class, id).getRecordType().getCode();
+    }
+    
 
     /**
      * enabling auditing
@@ -506,6 +517,19 @@ public class Records {
     public List<String> getIndexList(Class targetClass, String targetField) {
         String key = targetClass.getName() + "." + targetField;
         return getIndexList(key);
+    }
+    
+    
+    //--------------------------------------------------------------------------
+    // Transactions
+    //--------------------------------------------------------------------------
+    
+    /**
+     * spawn transaction for multiple accesses
+     * @param runnable 
+     */
+    public void transaction(Runnable runnable) {
+        mc.transaction(runnable);
     }
 
     //--------------------------------------------------------------------------

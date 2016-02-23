@@ -15,13 +15,13 @@
  */
 package com.auxeanne.data.record;
 
-import com.auxeanne.data.DefaultRecord;
+import com.auxeanne.data.AbstractRecord;
 
 /**
  *
  * @author Jean-Michel Tanguy
  */
-public class ReportingWeek extends DefaultRecord {
+public class ReportingWeek extends AbstractRecord {
     
     String week;
 

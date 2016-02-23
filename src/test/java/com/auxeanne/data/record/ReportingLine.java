@@ -15,14 +15,14 @@
  */
 package com.auxeanne.data.record;
 
-import com.auxeanne.data.DefaultRecord;
+import com.auxeanne.data.AbstractRecord;
 import java.util.HashMap;
 
 /**
  *
  * @author Jean-Michel Tanguy
  */
-public class ReportingLine extends DefaultRecord {
+public class ReportingLine extends AbstractRecord {
     
     
     HashMap<String, String> data = new HashMap<>();

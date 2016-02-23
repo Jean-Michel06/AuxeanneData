@@ -16,13 +16,13 @@
 package com.auxeanne.data.record;
 
 import com.auxeanne.data.FieldIndexing;
-import com.auxeanne.data.DefaultRecord;
+import com.auxeanne.data.AbstractRecord;
 
 /**
  *
  * @author Jean-Michel Tanguy
  */
-public class PersonRecordWithIndex extends DefaultRecord {
+public class PersonRecordWithIndex extends AbstractRecord {
     
     @FieldIndexing
     Integer age;

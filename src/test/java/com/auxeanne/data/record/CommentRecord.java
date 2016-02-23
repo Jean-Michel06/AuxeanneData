@@ -15,14 +15,14 @@
  */
 package com.auxeanne.data.record;
 
-import com.auxeanne.data.DefaultRecord;
+import com.auxeanne.data.AbstractRecord;
 import com.auxeanne.data.FieldIndexing;
 
 /**
  *
  * @author Jean-Michel Tanguy
  */
-public class CommentRecord extends DefaultRecord {
+public class CommentRecord extends AbstractRecord {
     
     @FieldIndexing
     String message;
