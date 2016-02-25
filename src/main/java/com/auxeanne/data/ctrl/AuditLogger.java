@@ -22,7 +22,7 @@ import java.util.Date;
 
 /**
  * Dedicated operations to drop transactions in an audit table.
- * 
+ *
  *
  * @author Jean-Michel Tanguy
  */
@@ -56,7 +56,7 @@ public class AuditLogger {
             ra.setId(rw.getId());
             ra.setData(rw.getData());
             ra.setDocument(rw.getDocument());
-            ra.setRecordType(rw.getRecordType().getCode());
+            ra.setRecordType(rw.getRecordType());
 
             log(ra);
         }
@@ -72,7 +72,7 @@ public class AuditLogger {
             if (documentChanged) {
                 ra.setDocument(rw.getDocument());
             }
-            ra.setRecordType(rw.getRecordType().getCode());
+            ra.setRecordType(rw.getRecordType());
             //
             log(ra);
         }
@@ -84,7 +84,7 @@ public class AuditLogger {
             ra.setAction("RECORD_REMOVE");
             //
             ra.setId(rw.getId());
-            ra.setRecordType(rw.getRecordType().getCode());
+            ra.setRecordType(rw.getRecordType());
             //
             log(ra);
         }

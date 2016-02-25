@@ -36,8 +36,7 @@ import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import org.eclipse.persistence.annotations.JoinFetch;
-import org.eclipse.persistence.annotations.JoinFetchType;
+import org.eclipse.persistence.annotations.Index;
 
 /**
  * Entity mapping the database.
@@ -54,7 +53,7 @@ import org.eclipse.persistence.annotations.JoinFetchType;
     @NamedQuery(name = "RecordWrapper.searchByDataAndRecordType", query = "SELECT r FROM RecordWrapper r WHERE r.data like :search AND r.recordType = :recordType")
 })
 @Cacheable(true)
-//-- @Multitenant()  >> Multitenant relies on parent RecordType
+@Index(name = "EMP_NAME_INDEX", columnNames = {"tenant_", "record_type_"})
 //-- @Customizer(com.auxeanne.api.data.util.HistoryCustomizer.class) >> Hit on performance, so setting up custom Auditing
 public class RecordWrapper implements Serializable {
 
@@ -62,7 +61,6 @@ public class RecordWrapper implements Serializable {
     private List<RecordIndex> recordIndexList;
 
     private static final long serialVersionUID = 1L;
-
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "parentR")
     private List<RecordPath> parentList;
@@ -80,9 +78,9 @@ public class RecordWrapper implements Serializable {
     @Lob
     @Column(name = "data_")
     private String data;
-    @JoinColumn(name = "record_type_", referencedColumnName = "id_")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private RecordType recordType;
+    @Index
+    @Column(name = "record_type_")
+    private int recordType;
     @OneToMany(mappedBy = "reference", fetch = FetchType.LAZY)
     private List<RecordLink> referenceList;
     @OneToMany(mappedBy = "link", fetch = FetchType.LAZY)
@@ -90,8 +88,19 @@ public class RecordWrapper implements Serializable {
     @Lob
     @Column(name = "document_")
     private byte[] document;
+    @Index
+    @Column(name = "tenant_")
+    private String tenant;
 
     public RecordWrapper() {
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 
     public RecordWrapper(Long id) {
@@ -122,11 +131,11 @@ public class RecordWrapper implements Serializable {
         this.document = document;
     }
 
-    public RecordType getRecordType() {
+    public int getRecordType() {
         return recordType;
     }
 
-    public void setRecordType(RecordType recordType) {
+    public void setRecordType(int recordType) {
         this.recordType = recordType;
     }
 
@@ -200,7 +209,6 @@ public class RecordWrapper implements Serializable {
         this.pathList = pathList;
     }
 
-
     @XmlTransient
     public List<RecordIndex> getRecordIndexList() {
         return recordIndexList;
@@ -211,4 +219,3 @@ public class RecordWrapper implements Serializable {
     }
 
 }
-

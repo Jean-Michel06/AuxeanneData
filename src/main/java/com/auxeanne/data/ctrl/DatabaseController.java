@@ -42,8 +42,8 @@ import org.eclipse.persistence.jpa.JpaEntityManager;
 import org.eclipse.persistence.jpa.JpaHelper;
 
 /**
- * Providing common database features for "Records", "Preferences" and the fluent
- * APIs.
+ * Providing common database features for "Records", "Preferences" and the
+ * fluent APIs.
  *
  * @author Jean-Michel Tanguy
  */
@@ -121,7 +121,7 @@ public class DatabaseController {
         this.em = em;
         this.utx = utx;
         this.emf = null;
-        
+
         JpaEntityManager jem = JpaHelper.getEntityManager(em);
         jem.getUnitOfWork().setShouldPerformDeletesFirst(true);
         this.em = jem;
@@ -139,7 +139,7 @@ public class DatabaseController {
         this.em = em;
         this.utx = null;
         this.emf = null;
-        
+
         JpaEntityManager jem = JpaHelper.getEntityManager(em);
         jem.getUnitOfWork().setShouldPerformDeletesFirst(true);
         this.em = jem;
@@ -180,7 +180,7 @@ public class DatabaseController {
      * transaction (BMT). Resource must be JTA. Typically used in EJB and
      * managed beans.
      *
-     * @param emf Entity manager factory 
+     * @param emf Entity manager factory
      * @param utx User transaction
      */
     public DatabaseController(EntityManagerFactory emf, UserTransaction utx) {
@@ -216,8 +216,8 @@ public class DatabaseController {
      * @return EntityManager
      */
     public EntityManager getTransactionEntityManager() {
-        if (em == null || (!em.isOpen()&&emf!=null)) {
-            em =null;
+        if (em == null || (!em.isOpen() && emf != null)) {
+            em = null;
             // EclipseLink magic for optimal behavior on model usage by forcing delete first
             JpaEntityManager jem = JpaHelper.getEntityManager(emf.createEntityManager(properties));
             jem.getUnitOfWork().setShouldPerformDeletesFirst(true);
@@ -377,7 +377,7 @@ public class DatabaseController {
     /**
      * json to instance
      *
-     * @param <T> Type to return 
+     * @param <T> Type to return
      * @param data JSON string
      * @param modelClass Class to convert to
      * @return POJO
@@ -400,7 +400,7 @@ public class DatabaseController {
     /**
      * encapsulating a record and its properties in a POJO
      *
-     * @param <T> Type to return 
+     * @param <T> Type to return
      * @param wrapper Entity from database
      * @param recordClass Targeted class
      * @return POJO
@@ -443,6 +443,7 @@ public class DatabaseController {
 
     /**
      * list (and cache) all the fields of a class with indexing annotation
+     *
      * @param <T> All POJOs must extend DefaultRecord
      * @param recordClass Class to parse for indexed field
      * @return List of field with indexing annotation

@@ -49,10 +49,9 @@ import org.eclipse.persistence.annotations.Index;
     @NamedQuery(name = "RecordLink.findByLinkId", query = "SELECT rl.recordLinkPK FROM RecordLink rl  WHERE  rl.link.id = :id"),
     @NamedQuery(name = "RecordLink.findByReferenceIdList", query = "SELECT rl.recordLinkPK FROM RecordLink rl  WHERE  rl.reference.id in :list"),
     @NamedQuery(name = "RecordLink.findByLinkIdList", query = "SELECT rl.recordLinkPK FROM RecordLink rl  WHERE  rl.link.id in :list")
-   })
+})
 @Index(name = "EMP_NAME_INDEX", columnNames = {"reference_", "link_"})
 @Cacheable(true)
-//-- @Multitenant() >> Multi tenant is derived from RecordType
 public class RecordLink implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -69,8 +68,7 @@ public class RecordLink implements Serializable {
     @Column(name = "date_")
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
-    
-    
+
     @JoinColumn(name = "reference_", referencedColumnName = "id_", insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private RecordWrapper reference;
@@ -113,8 +111,6 @@ public class RecordLink implements Serializable {
         this.numeric = numeric;
     }
 
- 
-
     public RecordWrapper getReference() {
         return reference;
     }
@@ -138,8 +134,6 @@ public class RecordLink implements Serializable {
     public void setDate(Date date) {
         this.date = date;
     }
-    
-    
 
     @Override
     public int hashCode() {

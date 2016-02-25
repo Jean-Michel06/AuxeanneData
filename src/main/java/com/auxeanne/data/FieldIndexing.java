@@ -22,9 +22,8 @@ import java.lang.annotation.Target;
 
 /**
  * <p>Indexing the field.</p>
- * <p>By default indexes are identified by the class and the field.
- * But an index name can be preferred to share the index through multiple fields and classes by setting a "key" value.</p>
  * <p>Indexing a field allows finer query filtering and sorting.</p>
+ * <p>By default an index is bound to the field only. Instead, a shared index can be used by providing a key name.</p>
  * 
  * @author Jean-Michel Tanguy
  */

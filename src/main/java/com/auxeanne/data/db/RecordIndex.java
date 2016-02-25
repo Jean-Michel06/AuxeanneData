@@ -47,7 +47,6 @@ import org.eclipse.persistence.annotations.Multitenant;
     @NamedQuery(name = "RecordIndex.findDateFromKey", query = "SELECT DISTINCT r.date FROM RecordIndex r WHERE r.recordIndexPK.key =:key  AND r.date IS NOT NULL ORDER BY r.date ASC"),
     @NamedQuery(name = "RecordIndex.findNumericFromKey", query = "SELECT DISTINCT r.numeric FROM RecordIndex r WHERE r.recordIndexPK.key =:key  AND r.numeric IS NOT NULL  ORDER BY r.numeric ASC")})
 @Cacheable(true)
-@Multitenant()
 public class RecordIndex implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -71,7 +70,7 @@ public class RecordIndex implements Serializable {
     @JoinColumn(name = "record_", referencedColumnName = "id_", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private RecordWrapper recordWrapper;
-    
+
     // mapping to default tenant column for master management
     @Column(name = "TENANT_ID", insertable = false, updatable = false)
     private String tenantId;

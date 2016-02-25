@@ -64,13 +64,11 @@ public class RecordAudit implements Serializable {
     @Column(name = "document_")
     private byte[] document;
     @Column(name = "record_type_")
-    private String recordType;
-    //
+    private int recordType;
     @Column(name = "reference_")
     private Long reference_;
     @Column(name = "link_")
     private Long link_;
-
     @Size(max = 255)
     @Column(name = "value_")
     private String value;
@@ -91,7 +89,7 @@ public class RecordAudit implements Serializable {
     // mapping to default tenant column for master management
     @Column(name = "TENANT_ID", insertable = false, updatable = false)
     private String tenantId;
-    
+
     public String getTenantId() {
         return tenantId;
     }
@@ -123,11 +121,11 @@ public class RecordAudit implements Serializable {
         this.document = document;
     }
 
-    public String getRecordType() {
+    public int getRecordType() {
         return recordType;
     }
 
-    public void setRecordType(String recordType) {
+    public void setRecordType(int recordType) {
         this.recordType = recordType;
     }
 

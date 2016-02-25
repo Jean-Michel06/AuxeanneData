@@ -33,25 +33,26 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "record_path")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "RecordPath.findExistingParents",  query = "SELECT p.recordPathPK.parent FROM RecordPath p WHERE p.parentR = p.pathR AND p.recordPathPK.parent in :list AND p.recordPathPK.child =:id "),
-    @NamedQuery(name = "RecordPath.findExistingChildren",  query = "SELECT p.recordPathPK.child FROM RecordPath p WHERE p.parentR = p.pathR AND p.recordPathPK.child in :list AND p.recordPathPK.parent = :id "),
-    @NamedQuery(name = "RecordPath.findChildFromIdList",  query = "SELECT rp.recordPathPK FROM RecordPath rp WHERE rp.recordPathPK.child in :list"),
+    @NamedQuery(name = "RecordPath.findExistingParents", query = "SELECT p.recordPathPK.parent FROM RecordPath p WHERE p.parentR = p.pathR AND p.recordPathPK.parent in :list AND p.recordPathPK.child =:id "),
+    @NamedQuery(name = "RecordPath.findExistingChildren", query = "SELECT p.recordPathPK.child FROM RecordPath p WHERE p.parentR = p.pathR AND p.recordPathPK.child in :list AND p.recordPathPK.parent = :id "),
+    @NamedQuery(name = "RecordPath.findChildFromIdList", query = "SELECT rp.recordPathPK FROM RecordPath rp WHERE rp.recordPathPK.child in :list"),
     @NamedQuery(name = "RecordPath.findParentFromIdList", query = "SELECT rp.recordPathPK FROM RecordPath rp WHERE rp.recordPathPK.parent in :list")
 })
 
 public class RecordPath implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected RecordPathPK recordPathPK;
-    
+
     @JoinColumn(name = "parent_", referencedColumnName = "id_", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private RecordWrapper parentR;
-    
+
     @JoinColumn(name = "child_", referencedColumnName = "id_", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private RecordWrapper childR;
-    
+
     @JoinColumn(name = "path_", referencedColumnName = "id_", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private RecordWrapper pathR;
@@ -99,10 +100,6 @@ public class RecordPath implements Serializable {
         this.pathR = pathR;
     }
 
-   
-
- 
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -127,5 +124,5 @@ public class RecordPath implements Serializable {
     public String toString() {
         return "RecordPath[ recordPathPK=" + recordPathPK + " ]";
     }
-    
+
 }

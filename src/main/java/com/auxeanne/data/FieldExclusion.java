@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marking the field to be excluded from database storage.
+ * Excluding field from database storage.
  * 
  * @author Jean-Michel
  */

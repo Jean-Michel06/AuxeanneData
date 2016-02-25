@@ -40,6 +40,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.transaction.UserTransaction;
+import org.eclipse.persistence.config.EntityManagerProperties;
 import org.eclipse.persistence.queries.CursoredStream;
 
 /**
@@ -51,11 +52,13 @@ import org.eclipse.persistence.queries.CursoredStream;
  * Fields are excluded from database using annotation RecordExclusion and
  * indexed using the annotation FieldIndexing.</p>
  * <p>
- * @XmlRootElement is optional in the record extended class.</p>
+ * Annotation XmlRootElement is optional in the record extended class.</p>
  * <p>
  * Records relies on a persistence unit to connect to the database, i.e.
  * persistence.xml must be configured accordingly. Please see the TEST resources
  * to find examples for several databases.</p>
+ * <p>
+ * Writing operation are automatically encapsulated in transactions.
  * <p>
  * Multi-tenant is supported and is configured in the entity manager or the
  * entity manager factory.</p>
@@ -201,7 +204,7 @@ public class Records {
             });
         }
     }
-    
+
     /**
      * parsing record to extract indexed fields
      *
@@ -397,7 +400,6 @@ public class Records {
      record.setId(null);
      }
      */
-
     /**
      * saving and cloning records
      *
@@ -416,6 +418,7 @@ public class Records {
             for (T record : records) {
                 RecordWrapper wrapper = mc.getTransactionEntityManager().find(RecordWrapper.class, record.getId());
                 cloneWrapper.setRecordType(wrapper.getRecordType());
+                cloneWrapper.setTenant(wrapper.getTenant());
                 if (wrapper.getData() != null) {
                     cloneWrapper.setData(wrapper.getData());
                 }
@@ -453,17 +456,21 @@ public class Records {
     public <T extends Record> QueryBuilder<T> query(Class<T> referenceClass) {
         return new FluentQuery.Builder<>(mc, referenceClass);
     }
-    
+
     /**
-     * Gives the type of a record from its id.
-     * Main purpose is to check if the manipulated id has the correct type.
-     * @param id
-     * @return type name
+     * Gives the type of a record from its id. Main purpose is to check if the
+     * manipulated id has the correct type.
+     *
+     * @param id record id
+     * @return type name of the record
      */
     public String getRecordType(Long id) {
-        return mc.getTransactionEntityManager().find(RecordWrapper.class, id).getRecordType().getCode();
+        RecordWrapper record = mc.getTransactionEntityManager().find(RecordWrapper.class, id);
+        if (record != null) {
+            return mc.getTransactionEntityManager().find(RecordType.class, record.getRecordType()).getCode();
+        }
+        return null;
     }
-    
 
     /**
      * enabling auditing
@@ -518,15 +525,16 @@ public class Records {
         String key = targetClass.getName() + "." + targetField;
         return getIndexList(key);
     }
-    
-    
+
     //--------------------------------------------------------------------------
     // Transactions
     //--------------------------------------------------------------------------
     
     /**
-     * spawn transaction for multiple accesses
-     * @param runnable 
+     * Spawn transaction to group multiple writing operations.
+     * Otherwise a transaction is encapsulating each operation.
+     *
+     * @param runnable
      */
     public void transaction(Runnable runnable) {
         mc.transaction(runnable);
@@ -545,12 +553,17 @@ public class Records {
     private <T extends Record> RecordWrapper createRecordWrapper(T record) {
         RecordWrapper wrapper = new RecordWrapper();
         RecordType recordType = mc.getType(record.getClass(), false);
-        wrapper.setRecordType(recordType);
+        wrapper.setRecordType(recordType.getId());
         wrapper.setData(mc.toWrapper(record));
         if (record.isDocumentChanged()) {
             wrapper.setDocument(record.getDocument());
         }
-        // getting the id from the JPA
+        //-- tenant management
+        Object tenant = mc.getTransactionEntityManager().getProperties().get(EntityManagerProperties.MULTITENANT_PROPERTY_DEFAULT);
+        if (tenant != null) {
+            wrapper.setTenant(tenant.toString());
+        }
+        //-- getting the id from the JPA
         mc.getTransactionEntityManager().persist(wrapper);
         Long recordId = wrapper.getId();
         record.setId(recordId);
@@ -571,7 +584,7 @@ public class Records {
         //-- retrieving hierarchies to complete with new branch >> finding all children of reference
         List<RecordPathPK> pkList = em.createQuery("SELECT rp.recordPathPK FROM RecordPath rp WHERE rp.recordPathPK.path = :path").setParameter("path", childId).getResultList();
         pkList.add(new RecordPathPK(parentId, childId, parentId));
-        // applying path branch to childrens
+        //-- applying path branch to childrens
         for (RecordPathPK pk : pkList) {
             for (Long path : pathList) {
                 pk.setPath(path);

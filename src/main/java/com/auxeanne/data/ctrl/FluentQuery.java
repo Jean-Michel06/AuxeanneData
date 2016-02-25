@@ -19,6 +19,7 @@ import com.auxeanne.data.db.RecordLink;
 import com.auxeanne.data.db.RecordPath;
 import com.auxeanne.data.db.RecordWrapper;
 import com.auxeanne.data.ctrl.ParameterManager.ParameterFilter;
+import com.auxeanne.data.db.RecordType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,6 +38,7 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import org.eclipse.persistence.config.EntityManagerProperties;
 
 /**
  * Fluent API to perform queries in Records.
@@ -72,7 +74,11 @@ public class FluentQuery {
         private String pathTarget = null;
         private Boolean sortByInsert = null; // true = asc; false = desc; null =none;
 
-        private ParameterManager pm = new ParameterManager();
+        private final ParameterManager pm = new ParameterManager();
+        // RecordType is constant for each query
+        private final RecordType type;
+        // linkingAny, childOfAny.... may bring duplicates when more than 1 target, which requires DISTINCT selector
+        private boolean isDistinctRequired = false;
 
         //----------------------------------------------------------------------
         // QueryBuilder<T> 
@@ -80,6 +86,9 @@ public class FluentQuery {
         public Builder(DatabaseController mc, Class<T> referenceClass) {
             this.referenceClass = referenceClass;
             this.mc = mc;
+            //-- fetching RecordType first to avoid closing the EM prematurely
+            type = mc.getType(referenceClass, false);
+            //-- opening a new Entity Manager
             em = mc.getTransactionEntityManager();
             cb = em.getCriteriaBuilder();
             cq = cb.createQuery();
@@ -90,9 +99,11 @@ public class FluentQuery {
             RecordWrapper record = mc.getTransactionEntityManager().find(RecordWrapper.class, id);
             try {
                 if (record != null) {
-                    Class c = Class.forName(record.getRecordType().getCode());
+                    RecordType parent = mc.getTransactionEntityManager().find(RecordType.class, record.getRecordType());
+                    Class c = Class.forName(parent.getCode());
                     if (referenceClass.isAssignableFrom(c)) {
-                        return mc.getRecord(referenceClass, record);
+                        T t = mc.getRecord(referenceClass, record);
+                        return t;
                     } else {
                         throw new IllegalAccessException();
                     }
@@ -106,7 +117,7 @@ public class FluentQuery {
         private void initRecordQuery() {
             recordRoot = cq.from(RecordWrapper.class);
             //-- adding match filter
-            applyExtendedQuery(recordRoot, null, predicateList );
+            applyExtendedQuery(recordRoot, null, predicateList);
         }
 
         //----------------------------------------------------------------------
@@ -196,12 +207,17 @@ public class FluentQuery {
             return this;
         }
 
-        private void applyExtendedQuery(Root root, String wrapperKey, List<Predicate> predicateList ) {
-            From wrapperRoot = (wrapperKey == null)?root:root.join(wrapperKey,  JoinType.INNER);
-            //-- forcing additional inner join for better performance
-            Join typeJoin =  wrapperRoot.join("recordType", JoinType.INNER)  ;
-            typeJoin.on( cb.equal(typeJoin.get("code"), referenceClass.getName()) );
-            
+        private void applyExtendedQuery(Root root, String wrapperKey, List<Predicate> predicateList) {
+            From wrapperRoot = (wrapperKey == null) ? root : root.join(wrapperKey, JoinType.INNER);
+            //-- reducing scope of the query with indexed keys filtering
+            //-- 1st limit to correct RecordType
+            predicateList.add(0, cb.equal(wrapperRoot.get("recordType"), type.getId()));
+            //-- 2nd tenant filtering where it applies. It is directly managed instead of Eclipselink annotations.
+            Object tenant = mc.getTransactionEntityManager().getProperties().get(EntityManagerProperties.MULTITENANT_PROPERTY_DEFAULT);
+            if (tenant != null) {
+                predicateList.add(cb.equal(wrapperRoot.get("tenant"), tenant.toString()));
+            }
+            //-- pass on the query parameters
             applyEqualQuery(wrapperRoot, predicateList);
             applyIndexQuery(wrapperRoot, predicateList);
             applySearchQuery(wrapperRoot, predicateList);
@@ -225,7 +241,7 @@ public class FluentQuery {
             IndexQueryManager indexManager = new IndexQueryManager();
             for (IndexQuery indexQuery : indexList) {
                 Predicate subQuery = indexManager.getSubQuery(cb, cq, referenceClass, recordPath, indexQuery, orderList);
-                if (subQuery!=null){
+                if (subQuery != null) {
                     predicateList.add(subQuery);
                 }
             }
@@ -247,7 +263,6 @@ public class FluentQuery {
         //----------------------------------------------------------------------
         @Override
         public List<T> getList() {
-            long startP = System.currentTimeMillis();
             ArrayList<T> list = new ArrayList<>();
             Query query;
             Path selectPath;
@@ -260,7 +275,13 @@ public class FluentQuery {
                 initRecordQuery();
                 selectPath = recordRoot;
             }
-            cq.select(selectPath).distinct(true); // AboveAny / BelowAny multiple path results in multiple paths selection with same target which must be filteres y Distinct
+            //-- DISTINCT is expensive, apply only when needed
+            if (isDistinctRequired) {
+                cq.select(selectPath).distinct(true); // AboveAny / BelowAny multiple path results in multiple paths selection with same target which must be filteres y Distinct
+            } else {
+                cq.select(selectPath);
+            }
+
             //-- order by , ultimatly ordering by record id
             if (sortByInsert != null) {
                 if (sortByInsert) {
@@ -269,7 +290,9 @@ public class FluentQuery {
                     orderList.add(cb.desc(selectPath.get("id")));
                 }
             }
-            cq.orderBy(orderList);
+            if (!orderList.isEmpty()) {
+                cq.orderBy(orderList);
+            }
             //-- where
             cq.where(predicateList.toArray(new Predicate[0]));
             query = em.createQuery(cq);
@@ -280,20 +303,14 @@ public class FluentQuery {
             if (maxResults != null) {
                 query.setMaxResults(maxResults);
             }
-            long startQ = System.currentTimeMillis();
             List<RecordWrapper> resultList = query.getResultList();
-            long endQ = System.currentTimeMillis();
-            long startC = System.currentTimeMillis();
-            // converting
+            //-- converting to object
             resultList.stream().map((record) -> {
                 T model = mc.getRecord(referenceClass, record);
                 return model;
             }).forEach((model) -> {
                 list.add(model);
             });
-            long endC = System.currentTimeMillis();
-            long endP = System.currentTimeMillis();
-            System.out.println("Get List for "+list.size()+"    Total: "+(endP-startP)+"ms     Query: "+(endQ-startQ)+"ms  Convert: "+(endC-startC)+"ms");
             return list;
         }
 
@@ -308,14 +325,22 @@ public class FluentQuery {
         public Integer count() {
             Query query;
             //-- query setup
+            Path selectPath;
             if (linkRoot != null) {
-                cq.select(cb.count(linkRoot));
+                selectPath = linkRoot.get("reference");
             } else if (pathRoot != null) {
-                cq.select(cb.countDistinct(pathRoot.get(pathTarget))); // AboveAny / BelowAny multiple path results in multiple paths selection with same target which must be filteres y Distinct
+                selectPath = pathRoot.get(pathTarget);
             } else {
                 initRecordQuery();
-                cq.select(cb.count(recordRoot));
+                selectPath = recordRoot;
             }
+            //-- DISTINCT is expensive, apply only when needed
+            if (isDistinctRequired) {
+                cq.select(cb.countDistinct(selectPath)); // AboveAny / BelowAny multiple path results in multiple paths selection with same target which must be filteres y Distinct
+            } else {
+                cq.select(cb.count(selectPath));
+            }
+            //-- where
             cq.where(predicateList.toArray(new Predicate[0]));
             query = em.createQuery(cq);
             //-- query parameters
@@ -377,9 +402,9 @@ public class FluentQuery {
 
         private void initLinkQuery() {
             linkRoot = cq.from(RecordLink.class);
-            Join<RecordLink,RecordWrapper> join = linkRoot.join("link");
+            Join<RecordLink, RecordWrapper> join = linkRoot.join("link");
             //-- adding match and index filters
-            applyExtendedQuery( linkRoot, "reference", predicateList);
+            applyExtendedQuery(linkRoot, "reference", predicateList);
         }
 
         //----------------------------------------------------------------------
@@ -521,7 +546,7 @@ public class FluentQuery {
         //----------------------------------------------------------------------
         private <T> void connectPath(boolean limitPath, boolean and, String source, String target, Record... records) {
             pathRoot = cq.from(RecordPath.class);
-            Join<RecordPath,RecordWrapper> toJoin = pathRoot.join("pathR");
+            Join<RecordPath, RecordWrapper> toJoin = pathRoot.join("pathR");
             pathTarget = target;
             //-- adding match and index filter
             applyExtendedQuery(pathRoot, target, predicateList);
@@ -565,6 +590,10 @@ public class FluentQuery {
                 }
             }
             predicateList.add(cb.or(ors));
+            //-- duplicates may arise when more than 1 record in the join, DISTINCT optimization is then required
+            if (records.length > 1) {
+                isDistinctRequired = true;
+            }
         }
 
     }

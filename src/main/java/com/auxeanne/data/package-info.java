@@ -6,7 +6,7 @@
  * The test folder is showing reference implementations for most common databases and main usages.<br>
  * </p>
  * <p>
- * Important : POJOs must extend the DefaultRecord class to be managed by the framework.
+ * Important : POJOs must extend the AbstractRecord class to be managed by the framework.
  * </p>
  * 
  * @author Jean-Michel Tanguy
