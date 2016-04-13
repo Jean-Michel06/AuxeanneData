@@ -55,7 +55,7 @@ public class AuditLogger {
 
             ra.setId(rw.getId());
             ra.setData(rw.getData());
-            ra.setDocument(rw.getDocument());
+            ////ra.setDocument(rw.getDocument());
             ra.setRecordType(rw.getRecordType());
 
             log(ra);
@@ -70,7 +70,7 @@ public class AuditLogger {
             ra.setId(rw.getId());
             ra.setData(rw.getData());
             if (documentChanged) {
-                ra.setDocument(rw.getDocument());
+            ////ra.setDocument(rw.getDocument());
             }
             ra.setRecordType(rw.getRecordType());
             //
@@ -117,7 +117,7 @@ public class AuditLogger {
         }
     }
 
-    public void logPreference(String key, String value) {
+    public void logPreference(String key, byte[] value) {
         if (enabled) {
             RecordAudit ra = new RecordAudit();
             ra.setAction("PREFERENCE");

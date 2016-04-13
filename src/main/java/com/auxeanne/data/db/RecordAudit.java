@@ -59,7 +59,7 @@ public class RecordAudit implements Serializable {
     private Long id;
     @Lob
     @Column(name = "data_")
-    private String data;
+    private byte[] data;
     @Lob
     @Column(name = "document_")
     private byte[] document;
@@ -105,11 +105,11 @@ public class RecordAudit implements Serializable {
         this.id = id;
     }
 
-    public String getData() {
+    public byte[] getData() {
         return data;
     }
 
-    public void setData(String data) {
+    public void setData(byte[] data) {
         this.data = data;
     }
 

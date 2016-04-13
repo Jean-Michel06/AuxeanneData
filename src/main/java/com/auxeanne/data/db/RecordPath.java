@@ -33,17 +33,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "record_path")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "RecordPath.findExistingParents", query = "SELECT p.recordPathPK.parent FROM RecordPath p WHERE p.parentR = p.pathR AND p.recordPathPK.parent in :list AND p.recordPathPK.child =:id "),
-    @NamedQuery(name = "RecordPath.findExistingChildren", query = "SELECT p.recordPathPK.child FROM RecordPath p WHERE p.parentR = p.pathR AND p.recordPathPK.child in :list AND p.recordPathPK.parent = :id "),
-    @NamedQuery(name = "RecordPath.findChildFromIdList", query = "SELECT rp.recordPathPK FROM RecordPath rp WHERE rp.recordPathPK.child in :list"),
-    @NamedQuery(name = "RecordPath.findParentFromIdList", query = "SELECT rp.recordPathPK FROM RecordPath rp WHERE rp.recordPathPK.parent in :list")
+    @NamedQuery(name = "RecordPath.findExistingParents", query = "SELECT p.recordPK.parent FROM RecordPath p WHERE p.parentR = p.pathR AND p.recordPK.parent in :list AND p.recordPK.child =:id "),
+    @NamedQuery(name = "RecordPath.findExistingChildren", query = "SELECT p.recordPK.child FROM RecordPath p WHERE p.parentR = p.pathR AND p.recordPK.child in :list AND p.recordPK.parent = :id "),
+    @NamedQuery(name = "RecordPath.findChildFromIdList", query = "SELECT rp.recordPK FROM RecordPath rp WHERE rp.recordPK.child in :list"),
+    @NamedQuery(name = "RecordPath.findParentFromIdList", query = "SELECT rp.recordPK FROM RecordPath rp WHERE rp.recordPK.parent in :list")
 })
 
 public class RecordPath implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
-    protected RecordPathPK recordPathPK;
+    protected RecordPathPK recordPK; // name optimized for fluent query
 
     @JoinColumn(name = "parent_", referencedColumnName = "id_", insertable = false, updatable = false)
     @ManyToOne(optional = false)
@@ -61,19 +61,19 @@ public class RecordPath implements Serializable {
     }
 
     public RecordPath(RecordPathPK recordPathPK) {
-        this.recordPathPK = recordPathPK;
+        this.recordPK = recordPathPK;
     }
 
     public RecordPath(Long parent, Long child, Long path) {
-        this.recordPathPK = new RecordPathPK(parent, child, path);
+        this.recordPK = new RecordPathPK(parent, child, path);
     }
 
-    public RecordPathPK getRecordPathPK() {
-        return recordPathPK;
+    public RecordPathPK getRecordPK() {
+        return recordPK;
     }
 
-    public void setRecordPathPK(RecordPathPK recordPathPK) {
-        this.recordPathPK = recordPathPK;
+    public void setRecordPK(RecordPathPK recordPathPK) {
+        this.recordPK = recordPathPK;
     }
 
     public RecordWrapper getParentR() {
@@ -103,7 +103,7 @@ public class RecordPath implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (recordPathPK != null ? recordPathPK.hashCode() : 0);
+        hash += (recordPK != null ? recordPK.hashCode() : 0);
         return hash;
     }
 
@@ -114,7 +114,7 @@ public class RecordPath implements Serializable {
             return false;
         }
         RecordPath other = (RecordPath) object;
-        if ((this.recordPathPK == null && other.recordPathPK != null) || (this.recordPathPK != null && !this.recordPathPK.equals(other.recordPathPK))) {
+        if ((this.recordPK == null && other.recordPK != null) || (this.recordPK != null && !this.recordPK.equals(other.recordPK))) {
             return false;
         }
         return true;
@@ -122,7 +122,7 @@ public class RecordPath implements Serializable {
 
     @Override
     public String toString() {
-        return "RecordPath[ recordPathPK=" + recordPathPK + " ]";
+        return "RecordPath[ recordPathPK=" + recordPK + " ]";
     }
 
 }

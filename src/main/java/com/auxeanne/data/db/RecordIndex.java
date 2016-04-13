@@ -63,21 +63,9 @@ public class RecordIndex implements Serializable {
     @Column(name = "date_")
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
-
-//    @JoinColumn(name = "key_", referencedColumnName = "key_", insertable = false, updatable = false)
-//    @ManyToOne(optional = false)
-//    private RecordIndexKey recordIndexKey;
     @JoinColumn(name = "record_", referencedColumnName = "id_", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private RecordWrapper recordWrapper;
-
-    // mapping to default tenant column for master management
-    @Column(name = "TENANT_ID", insertable = false, updatable = false)
-    private String tenantId;
-
-    public String getTenantId() {
-        return tenantId;
-    }
 
     public RecordIndex() {
     }
@@ -98,13 +86,6 @@ public class RecordIndex implements Serializable {
         this.recordIndexPK = recordIndexPK;
     }
 
-//    public RecordIndexKey getRecordIndexKey() {
-//        return recordIndexKey;
-//    }
-//
-//    public void setRecordIndexKey(RecordIndexKey recordIndexKey) {
-//        this.recordIndexKey = recordIndexKey;
-//    }
     public RecordWrapper getRecordWrapper() {
         return recordWrapper;
     }

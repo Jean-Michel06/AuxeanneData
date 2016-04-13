@@ -16,6 +16,7 @@
 package com.auxeanne.data.record;
 
 import com.auxeanne.data.AbstractRecord;
+import com.auxeanne.data.FieldIndexing;
 
 /**
  *
@@ -23,7 +24,7 @@ import com.auxeanne.data.AbstractRecord;
  */
 public class PersonRecord extends AbstractRecord {
     
-    
+    @FieldIndexing
     String firstName, lastName;
 
     public String getFirstName() {

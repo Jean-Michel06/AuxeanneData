@@ -43,12 +43,12 @@ import org.eclipse.persistence.annotations.Index;
 @Table(name = "record_link")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "RecordLink.findExistingLinks", query = "SELECT rl FROM RecordLink rl WHERE rl.recordLinkPK.reference_ = :id AND rl.recordLinkPK.link_ in :list"),
-    @NamedQuery(name = "RecordLink.findExistingReferences", query = "SELECT rl FROM RecordLink rl WHERE rl.recordLinkPK.link_ = :id AND rl.recordLinkPK.reference_ in :list"),
-    @NamedQuery(name = "RecordLink.findByReferenceId", query = "SELECT rl.recordLinkPK FROM RecordLink rl  WHERE  rl.reference.id = :id"),
-    @NamedQuery(name = "RecordLink.findByLinkId", query = "SELECT rl.recordLinkPK FROM RecordLink rl  WHERE  rl.link.id = :id"),
-    @NamedQuery(name = "RecordLink.findByReferenceIdList", query = "SELECT rl.recordLinkPK FROM RecordLink rl  WHERE  rl.reference.id in :list"),
-    @NamedQuery(name = "RecordLink.findByLinkIdList", query = "SELECT rl.recordLinkPK FROM RecordLink rl  WHERE  rl.link.id in :list")
+    @NamedQuery(name = "RecordLink.findExistingLinks", query = "SELECT rl FROM RecordLink rl WHERE rl.recordPK.reference = :id AND rl.recordPK.link in :list"),
+    @NamedQuery(name = "RecordLink.findExistingReferences", query = "SELECT rl FROM RecordLink rl WHERE rl.recordPK.link = :id AND rl.recordPK.reference in :list"),
+    @NamedQuery(name = "RecordLink.findByReferenceId", query = "SELECT rl.recordPK FROM RecordLink rl  WHERE  rl.referenceR.id = :id"),
+    @NamedQuery(name = "RecordLink.findByLinkId", query = "SELECT rl.recordPK FROM RecordLink rl  WHERE  rl.linkR.id = :id"),
+    @NamedQuery(name = "RecordLink.findByReferenceIdList", query = "SELECT rl.recordPK FROM RecordLink rl  WHERE  rl.referenceR.id in :list"),
+    @NamedQuery(name = "RecordLink.findByLinkIdList", query = "SELECT rl.recordPK FROM RecordLink rl  WHERE  rl.linkR.id in :list")
 })
 @Index(name = "EMP_NAME_INDEX", columnNames = {"reference_", "link_"})
 @Cacheable(true)
@@ -56,7 +56,7 @@ public class RecordLink implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
-    protected RecordLinkPK recordLinkPK;
+    protected RecordLinkPK recordPK; // name optimized for fluent query
     @Index
     @Size(max = 255)
     @Column(name = "value_")
@@ -71,28 +71,28 @@ public class RecordLink implements Serializable {
 
     @JoinColumn(name = "reference_", referencedColumnName = "id_", insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private RecordWrapper reference;
+    private RecordWrapper referenceR;
     @JoinColumn(name = "link_", referencedColumnName = "id_", insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private RecordWrapper link;
+    private RecordWrapper linkR;
 
     public RecordLink() {
     }
 
     public RecordLink(RecordLinkPK recordLinkPK) {
-        this.recordLinkPK = recordLinkPK;
+        this.recordPK = recordLinkPK;
     }
 
     public RecordLink(int idRecord, int idLink) {
-        this.recordLinkPK = new RecordLinkPK(idRecord, idLink);
+        this.recordPK = new RecordLinkPK(idRecord, idLink);
     }
 
-    public RecordLinkPK getRecordLinkPK() {
-        return recordLinkPK;
+    public RecordLinkPK getRecordPK() {
+        return recordPK;
     }
 
-    public void setRecordLinkPK(RecordLinkPK recordLinkPK) {
-        this.recordLinkPK = recordLinkPK;
+    public void setRecordPK(RecordLinkPK recordLinkPK) {
+        this.recordPK = recordLinkPK;
     }
 
     public String getValue() {
@@ -111,20 +111,20 @@ public class RecordLink implements Serializable {
         this.numeric = numeric;
     }
 
-    public RecordWrapper getReference() {
-        return reference;
+    public RecordWrapper getReferenceR() {
+        return referenceR;
     }
 
-    public void setReference(RecordWrapper reference) {
-        this.reference = reference;
+    public void setReferenceR(RecordWrapper reference) {
+        this.referenceR = reference;
     }
 
-    public RecordWrapper getLink() {
-        return link;
+    public RecordWrapper getLinkR() {
+        return linkR;
     }
 
-    public void setLink(RecordWrapper link) {
-        this.link = link;
+    public void setLinkR(RecordWrapper link) {
+        this.linkR = link;
     }
 
     public Date getDate() {
@@ -138,7 +138,7 @@ public class RecordLink implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (recordLinkPK != null ? recordLinkPK.hashCode() : 0);
+        hash += (recordPK != null ? recordPK.hashCode() : 0);
         return hash;
     }
 
@@ -149,7 +149,7 @@ public class RecordLink implements Serializable {
             return false;
         }
         RecordLink other = (RecordLink) object;
-        if ((this.recordLinkPK == null && other.recordLinkPK != null) || (this.recordLinkPK != null && !this.recordLinkPK.equals(other.recordLinkPK))) {
+        if ((this.recordPK == null && other.recordPK != null) || (this.recordPK != null && !this.recordPK.equals(other.recordPK))) {
             return false;
         }
         return true;
@@ -157,7 +157,7 @@ public class RecordLink implements Serializable {
 
     @Override
     public String toString() {
-        return "RecordLink[ recordLinkPK=" + recordLinkPK + " ]";
+        return "RecordLink[ recordLinkPK=" + recordPK + " ]";
     }
 
 }

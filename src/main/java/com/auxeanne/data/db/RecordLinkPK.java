@@ -30,40 +30,40 @@ import javax.persistence.Embeddable;
 public class RecordLinkPK implements Serializable {
     @Basic(optional = false)
     @Column(name = "reference_")
-    private long reference_;
+    private long reference;
     @Basic(optional = false)
     @Column(name = "link_")
-    private long link_;
+    private long link;
     
     public RecordLinkPK() {
     }
 
     public RecordLinkPK(long reference_, long link_) {
-        this.reference_ = reference_;
-        this.link_ = link_;
+        this.reference = reference_;
+        this.link = link_;
     }
 
-    public long getReference_() {
-        return reference_;
+    public long getReference() {
+        return reference;
     }
 
-    public void setReference_(long reference_) {
-        this.reference_ = reference_;
+    public void setReference(long reference_) {
+        this.reference = reference_;
     }
 
-    public long getLink_() {
-        return link_;
+    public long getLink() {
+        return link;
     }
 
-    public void setLink_(long link_) {
-        this.link_ = link_;
+    public void setLink(long link_) {
+        this.link = link_;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (int) reference_;
-        hash += (int) link_;
+        hash += (int) reference;
+        hash += (int) link;
         return hash;
     }
 
@@ -74,10 +74,10 @@ public class RecordLinkPK implements Serializable {
             return false;
         }
         RecordLinkPK other = (RecordLinkPK) object;
-        if (this.reference_ != other.reference_) {
+        if (this.reference != other.reference) {
             return false;
         }
-        if (this.link_ != other.link_) {
+        if (this.link != other.link) {
             return false;
         }
         return true;
@@ -85,7 +85,7 @@ public class RecordLinkPK implements Serializable {
 
     @Override
     public String toString() {
-        return "RecordLinkPK[ referenceId=" + reference_ + ", linkId=" + link_ + " ]";
+        return "RecordLinkPK[ referenceId=" + reference + ", linkId=" + link + " ]";
     }
     
 }

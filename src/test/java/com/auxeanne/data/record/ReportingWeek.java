@@ -16,6 +16,7 @@
 package com.auxeanne.data.record;
 
 import com.auxeanne.data.AbstractRecord;
+import com.auxeanne.data.FieldIndexing;
 
 /**
  *
@@ -23,6 +24,7 @@ import com.auxeanne.data.AbstractRecord;
  */
 public class ReportingWeek extends AbstractRecord {
     
+    @FieldIndexing
     String week;
 
     public String getWeek() {

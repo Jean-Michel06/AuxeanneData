@@ -35,7 +35,7 @@ import org.eclipse.persistence.config.EntityManagerProperties;
 public class PU {
 
     // private static final String[] pus = {"JAVADB_TEST_PU","POSTGRES_TEST_PU", "MYSQL_TEST_PU","JAVADB_EMBEDDED_TEST_PU", "SQL_SERVER_TEST_PU","ORACLE_XE_TEST_PU"};
-    private static final String[] pus = { "MYSQL_TEST_PU", "POSTGRES_TEST_PU", "MYSQL_TEST_PU", "POSTGRES_TEST_PU"};
+    private static final String[] pus = { "POSTGRES_TEST_PU", "MYSQL_TEST_PU"};
     
     private static HashMap<String, EntityManagerFactory> map = null;
     private static List<String> puList;

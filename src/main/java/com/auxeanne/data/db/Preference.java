@@ -30,6 +30,7 @@ import javax.persistence.TableGenerator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.eclipse.persistence.annotations.Index;
 import org.eclipse.persistence.annotations.Multitenant;
 
 /**
@@ -44,17 +45,16 @@ import org.eclipse.persistence.annotations.Multitenant;
     @NamedQuery(name = "Preference.findAll", query = "SELECT p FROM Preference p"),
     @NamedQuery(name = "Preference.findById", query = "SELECT p FROM Preference p WHERE p.id = :id"),
     @NamedQuery(name = "Preference.findByKey", query = "SELECT p FROM Preference p WHERE p.key = :key")})
-@Multitenant() // using column multitenant (default) as table per tenant is not supported by EclipseLink DDL generation
+@Index(name = "PREFERENCE_TENANT_INDEX", columnNames = {"tenant_"})
 public class Preference implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @Id @GeneratedValue(strategy = GenerationType.TABLE, generator = "PREFERENCE_GEN") 
-    @TableGenerator(name="PREFERENCE_GEN", allocationSize = 5, initialValue = 1, pkColumnValue="Preference")
+    @TableGenerator(name="PREFERENCE_GEN", allocationSize = 1, initialValue = 1, pkColumnValue="Preference")
     @Basic(optional = false)
     @Column(name = "id_")
     private Integer id;
      
-
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
@@ -63,16 +63,18 @@ public class Preference implements Serializable {
     @Lob
     @Size(max = 65535)
     @Column(name = "value_")
-    private String value;
-    
-    // mapping to default tenant column for master management
-    @Column(name = "TENANT_ID", insertable = false, updatable = false)
-    private String tenantId;
+    private byte[] value;
+    @Index
+    @Column(name = "tenant_")
+    private String tenant;
 
-    public String getTenantId() {
-        return tenantId;
+    public String getTenant() {
+        return tenant;
     }
 
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
+    }
 
     public Preference() {
     }
@@ -81,7 +83,7 @@ public class Preference implements Serializable {
         this.id = id;
     }
 
-    public Preference(String key, String value) {
+    public Preference(String key, byte[] value) {
         this.key = key;
         this.value = value;
     }
@@ -102,11 +104,11 @@ public class Preference implements Serializable {
         this.key = key;
     }
 
-    public String getValue() {
+    public byte[] getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(byte[] value) {
         this.value = value;
     }
 

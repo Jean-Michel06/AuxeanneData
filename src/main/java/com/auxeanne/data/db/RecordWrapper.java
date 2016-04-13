@@ -26,9 +26,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -53,7 +51,7 @@ import org.eclipse.persistence.annotations.Index;
     @NamedQuery(name = "RecordWrapper.searchByDataAndRecordType", query = "SELECT r FROM RecordWrapper r WHERE r.data like :search AND r.recordType = :recordType")
 })
 @Cacheable(true)
-@Index(name = "EMP_NAME_INDEX", columnNames = {"tenant_", "record_type_"})
+@Index(name = "RECORD_TENANT_INDEX", columnNames = {"tenant_", "record_type_"})
 //-- @Customizer(com.auxeanne.api.data.util.HistoryCustomizer.class) >> Hit on performance, so setting up custom Auditing
 public class RecordWrapper implements Serializable {
 
@@ -71,30 +69,30 @@ public class RecordWrapper implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "RECORD_GEN")
-    @TableGenerator(name = "RECORD_GEN", allocationSize = 100, initialValue = 1, pkColumnValue = "Record")
+    @TableGenerator(name = "RECORD_GEN", allocationSize = 20, initialValue = 1, pkColumnValue = "Record")
     @Basic(optional = false)
     @Column(name = "id_")
     private Long id;
     @Lob
     @Column(name = "data_")
-    private String data;
+    private byte[] data;
     @Index
     @Column(name = "record_type_")
     private int recordType;
-    @OneToMany(mappedBy = "reference", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "referenceR", fetch = FetchType.LAZY)
     private List<RecordLink> referenceList;
-    @OneToMany(mappedBy = "link", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "linkR", fetch = FetchType.LAZY)
     private List<RecordLink> linkList;
-    @Lob
-    @Column(name = "document_")
-    private byte[] document;
+//    @Lob
+//    @Column(name = "document_")
+//    private byte[] document;
     @Index
     @Column(name = "tenant_")
     private String tenant;
 
     public RecordWrapper() {
     }
-
+    
     public String getTenant() {
         return tenant;
     }
@@ -115,21 +113,23 @@ public class RecordWrapper implements Serializable {
         this.id = id;
     }
 
-    public String getData() {
+    public byte[] getData() {
         return data;
     }
 
-    public void setData(String data) {
+    public void setData(byte[] data) {
         this.data = data;
     }
 
-    public byte[] getDocument() {
-        return document;
-    }
 
-    public void setDocument(byte[] document) {
-        this.document = document;
-    }
+
+//    public byte[] getDocument() {
+//        return document;
+//    }
+//
+//    public void setDocument(byte[] document) {
+//        this.document = document;
+//    }
 
     public int getRecordType() {
         return recordType;

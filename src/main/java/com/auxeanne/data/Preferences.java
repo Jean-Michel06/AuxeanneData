@@ -22,11 +22,14 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.transaction.UserTransaction;
+import org.eclipse.persistence.config.EntityManagerProperties;
 
 /**
- * <p>Providing "Preferences" like feature but storing the values in the database.
+ * <p>
+ * Providing "Preferences" like feature but storing the values in the database.
  * POJO can be stored which is handy for global configuration.</p>
- * <p>Multi tenant is supported.</p>
+ * <p>
+ * Multi tenant is supported.</p>
  *
  * @author Jean-Michel Tanguy
  */
@@ -36,7 +39,7 @@ public class Preferences {
      * database controller
      */
     private DatabaseController mc;
-    
+
     /**
      * default auditor is silent and must be activated with auditAs
      */
@@ -53,7 +56,6 @@ public class Preferences {
 //    public Preferences(EntityManager em, UserTransaction utx) {
 //        mc = new DatabaseController(em, utx);
 //    }
-
     /**
      * Setting the controller with : container managed entity manager and
      * transactions (CMT). Resource must be JTA. Typically used within EJB.
@@ -74,7 +76,7 @@ public class Preferences {
     public Preferences(EntityManagerFactory emf) {
         mc = new DatabaseController(emf);
     }
-    
+
     /**
      * Setting the controller with : bean managed entity and entity transaction.
      * Resource can be JTA or Local Resource. Typically used in Java SE or unit
@@ -98,7 +100,7 @@ public class Preferences {
     public Preferences(EntityManagerFactory emf, UserTransaction utx) {
         mc = new DatabaseController(emf, utx);
     }
-    
+
     /**
      * Setting the controller with : bean managed entity and bean managed
      * transaction (BMT). Resource must be JTA. Typically used in EJB and
@@ -119,11 +121,7 @@ public class Preferences {
      * @return preference value or null if key does not exist
      */
     public String get(String key) {
-        Preference preference = getPreference(key);
-        if (preference == null) {
-            return null;
-        }
-        return preference.getValue();
+        return get(key, String.class);
     }
 
     /**
@@ -133,16 +131,8 @@ public class Preferences {
      * @param value preference value
      */
     public void put(String key, String value) {
-        mc.transaction(() -> {
-            Preference preference = getPreference(key);
-            if (preference==null) {
-                preference = new Preference(key, value);
-                mc.getTransactionEntityManager().persist(preference);
-            } else {
-                preference.setValue(value);
-            }
-            auditor.logPreference(key, value);
-        });
+        byte[] content = mc.toWrapper(value); //gson.toJson(value);
+        save(key, content);
     }
 
     /**
@@ -154,12 +144,13 @@ public class Preferences {
      * @return mapped object or null if key does not exist
      */
     public <T> T get(String key, Class<T> target) {
-        String content = get(key);
-        if (content == null) {
+        Preference preference = getPreference(key);
+        if (preference == null) {
             return null;
         }
-        T value = mc.fromWrapper(content, target); //gson.fromJson(content, c);
+        T value = mc.fromWrapper(preference.getValue(), target); //gson.fromJson(content, c);
         return value;
+
     }
 
     /**
@@ -169,29 +160,54 @@ public class Preferences {
      * @param value mapped object
      */
     public void put(String key, Object value) {
-        String content = mc.toWrapper(value); //gson.toJson(value);
-        put(key, content);
+        byte[] content = mc.toWrapper(value); //gson.toJson(value);
+        save(key, content);
     }
-
-    /**
-     * reading the entity from the database
-     * @param key preference key
-     * @return entity
-     */
-    private Preference getPreference(String key) {
-       List<Preference> list = mc.getTransactionEntityManager().createQuery("SELECT p FROM Preference p WHERE p.key = :key ").setParameter("key", key).setMaxResults(1).getResultList();
-       return (list.isEmpty())?null:list.get(0);
+    
+    private void save(String key, byte[] value) {
+        mc.transaction(() -> {
+            Preference preference = getPreference(key);
+            if (preference == null) {
+                preference = new Preference(key, value);
+                Object tenant = mc.getTransactionEntityManager().getProperties().get(EntityManagerProperties.MULTITENANT_PROPERTY_DEFAULT);
+                if (tenant != null) {
+                    preference.setTenant(tenant.toString());
+                }
+                mc.getTransactionEntityManager().persist(preference);
+            } else {
+                preference.setValue(value);
+            }
+            auditor.logPreference(key, value);
+        });
     }
     
 
     /**
+     * reading the entity from the database
+     *
+     * @param key preference key
+     * @return entity
+     */
+    private Preference getPreference(String key) {
+        Object tenant = mc.getTransactionEntityManager().getProperties().get(EntityManagerProperties.MULTITENANT_PROPERTY_DEFAULT);
+        if (tenant != null) {
+            List<Preference> list = mc.getTransactionEntityManager().createQuery("SELECT p FROM Preference p WHERE p.key = :key and p.tenant = :tenant").setParameter("key", key).setParameter("tenant", tenant.toString()).setMaxResults(1).getResultList();
+            return (list.isEmpty()) ? null : list.get(0);
+        } else {
+            List<Preference> list = mc.getTransactionEntityManager().createQuery("SELECT p FROM Preference p WHERE p.key = :key").setParameter("key", key).setMaxResults(1).getResultList();
+            return (list.isEmpty()) ? null : list.get(0);
+        }
+    }
+
+    /**
      * enabling auditing
+     *
      * @param user name used for auditing logs
      */
     public void enableAudit(String user) {
         auditor = new AuditLogger(mc, user);
     }
-    
+
     /**
      * disabling audit for better performances
      */

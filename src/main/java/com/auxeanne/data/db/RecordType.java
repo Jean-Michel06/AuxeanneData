@@ -45,7 +45,7 @@ public class RecordType implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "RECORD_TYPE_GEN")
-    @TableGenerator(name = "RECORD_TYPE_GEN", allocationSize = 2, initialValue = 1, pkColumnValue = "RecordType")
+    @TableGenerator(name = "RECORD_TYPE_GEN", allocationSize = 1, initialValue = 1, pkColumnValue = "RecordType")
     @Basic(optional = false)
     @Column(name = "id_")
     private Integer id;

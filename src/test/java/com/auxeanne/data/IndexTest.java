@@ -86,7 +86,7 @@ public class IndexTest {
         System.out.println("    Inserting : " + loops + " in " + (end - start) + "ms");
 
         start = System.currentTimeMillis();
-        list = records.query(PersonRecord.class).fieldEqualTo("lastName", "NAME0").getList();
+        list = records.query(PersonRecord.class).indexEqualTo("lastName", "NAME0").getList();
         end = System.currentTimeMillis();
         System.out.println("    Query with match 1/50 : " + list.size() + " in " + (end - start) + "ms");
 

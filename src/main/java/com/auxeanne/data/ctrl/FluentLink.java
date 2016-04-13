@@ -246,12 +246,12 @@ public class FluentLink {
                         .setParameter("list", batchList)
                         .getResultList();
                 for (RecordLink link : existingList) {
-                    long linkId = link.getRecordLinkPK().getLink_();
+                    long linkId = link.getRecordPK().getLink();
                     if (batchList.contains(linkId)) {
                         link.setNumeric(numeric);
                         link.setValue(value);
                         link.setDate(date);
-                        processedList.add(link.getRecordLinkPK().getLink_());
+                        processedList.add(link.getRecordPK().getLink());
                     }
                 }
                 //-- processing revert of existing links
@@ -360,10 +360,10 @@ public class FluentLink {
             RecordPathPK newPk = new RecordPathPK(parentId, childId, parentId);
             //if (em.find(RecordPath.class, newPk) == null) {
             //-- building branch to propagate to new hierarchy >> getting the full path from the parent and including parent as new start point
-            List<Long> pathList = em.createQuery("SELECT rp.recordPathPK.path FROM RecordPath rp WHERE rp.recordPathPK.child = :child").setParameter("child", parentId).getResultList();
+            List<Long> pathList = em.createQuery("SELECT rp.recordPK.path FROM RecordPath rp WHERE rp.recordPK.child = :child").setParameter("child", parentId).getResultList();
             pathList.add(parentId);
             //-- retrieving hierarchies to complete with new branch >> finding all children of reference
-            List<RecordPathPK> pkList = em.createQuery("SELECT rp.recordPathPK FROM RecordPath rp WHERE rp.recordPathPK.path = :path").setParameter("path", childId).getResultList();
+            List<RecordPathPK> pkList = em.createQuery("SELECT rp.recordPK FROM RecordPath rp WHERE rp.recordPK.path = :path").setParameter("path", childId).getResultList();
             pkList.add(newPk);
             // applying path branch to childrens
             for (RecordPathPK pk : pkList) {
@@ -378,10 +378,10 @@ public class FluentLink {
         private void removeHierarchy(Long parentId, Long childId) {
             EntityManager em = mc.getTransactionEntityManager();
             //-- building branch to remove from below hierarchy >> using parent to use only this parent path if more than one exists
-            List<Long> pathList = em.createQuery("SELECT rp.recordPathPK.path FROM RecordPath rp WHERE rp.recordPathPK.child = :child").setParameter("child", parentId).getResultList();
+            List<Long> pathList = em.createQuery("SELECT rp.recordPK.path FROM RecordPath rp WHERE rp.recordPK.child = :child").setParameter("child", parentId).getResultList();
             pathList.add(parentId);
             //-- retrieving hierarchies to complete with new branch >> finding all children of reference
-            List<RecordPathPK> pkList = em.createQuery("SELECT rp.recordPathPK FROM RecordPath rp WHERE rp.recordPathPK.path = :path").setParameter("path", childId).getResultList();
+            List<RecordPathPK> pkList = em.createQuery("SELECT rp.recordPK FROM RecordPath rp WHERE rp.recordPK.path = :path").setParameter("path", childId).getResultList();
             pkList.add(new RecordPathPK(parentId, childId, parentId));
             // applying path branch to childrens
             for (RecordPathPK pk : pkList) {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.auxeanne.data; 
+package com.auxeanne.data;
 
 import com.auxeanne.data.record.CommentRecord;
 import com.auxeanne.data.record.PersonRecord;
@@ -86,6 +86,31 @@ public class TenantTest {
             assertEquals(10L, records2.query(PersonRecord.class).count().longValue());
             assertEquals(10L, records2.query(PersonRecord.class).linking(t2).count().longValue());
             assertEquals(0L, records1.query(PersonRecord.class).linking(t2).count().longValue());
+        }
+    }
+
+    @Test
+    public void testMultiTenantPreferences() {
+
+        for (String pu : PU.getPuList()) {
+            System.out.println("\n=== Testing " + pu);
+            EntityManagerFactory emf = PU.getFactoryList().get(pu);
+            Preferences p1 = new Preferences(emf, "Tenant 1");
+            Preferences p2 = new Preferences(emf, "Tenant 2");
+
+            // Setting to T1
+            CommentRecord t1 = new CommentRecord();
+            t1.setMessage("t1");
+            p1.put("data", t1);
+
+            // Setting to T2
+            CommentRecord t2 = new CommentRecord();
+            t2.setMessage("t2");
+            p2.put("data", t2);
+            
+            CommentRecord t = p1.get("data", CommentRecord.class);
+            assertEquals(t.getMessage(), t1.getMessage());
+
         }
     }
 

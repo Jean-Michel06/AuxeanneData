@@ -162,7 +162,7 @@ public class LinkTest {
             records.save(p);
         }
         long start = System.currentTimeMillis();
-        assertEquals(2, records.query(PersonRecord.class).fieldIn("firstName", "FN10", "FN1").count().intValue());
+        assertEquals(2, records.query(PersonRecord.class).indexIn("firstName", "FN10", "FN1").count().intValue());
         long end = System.currentTimeMillis();
         System.out.println("  Counting Matches in " + (end - start) + "ms");
     }

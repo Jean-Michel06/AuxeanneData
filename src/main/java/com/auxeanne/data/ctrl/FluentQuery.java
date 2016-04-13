@@ -123,17 +123,17 @@ public class FluentQuery {
         //----------------------------------------------------------------------
         // ExtendedQuery<T>
         //----------------------------------------------------------------------
-        @Override
-        public ExtendedQuery<T> fieldEqualTo(String key, String value) {
-            equalMap.put(key, Arrays.asList(value));
-            return this;
-        }
+//        @Override
+//        public ExtendedQuery<T> fieldEqualTo(String key, String value) {
+//            equalMap.put(key, Arrays.asList(value));
+//            return this;
+//        }
 
-        @Override
-        public ExtendedQuery<T> fieldIn(String key, String... values) {
-            equalMap.put(key, Arrays.asList(values));
-            return this;
-        }
+//        @Override
+//        public ExtendedQuery<T> fieldIn(String key, String... values) {
+//            equalMap.put(key, Arrays.asList(values));
+//            return this;
+//        }
 
         @Override
         public ExtendedQuery<T> indexLike(String field, String... values) {
@@ -268,7 +268,7 @@ public class FluentQuery {
             Path selectPath;
             //-- query setup
             if (linkRoot != null) {
-                selectPath = linkRoot.get("reference");
+                selectPath = linkRoot.get("referenceR");
             } else if (pathRoot != null) {
                 selectPath = pathRoot.get(pathTarget);
             } else {
@@ -303,7 +303,10 @@ public class FluentQuery {
             if (maxResults != null) {
                 query.setMaxResults(maxResults);
             }
+            //long start = System.currentTimeMillis();
             List<RecordWrapper> resultList = query.getResultList();
+            //long end = System.currentTimeMillis();
+            //System.out.println("[] List query in "+(end-start)+"ms");
             //-- converting to object
             resultList.stream().map((record) -> {
                 T model = mc.getRecord(referenceClass, record);
@@ -327,7 +330,7 @@ public class FluentQuery {
             //-- query setup
             Path selectPath;
             if (linkRoot != null) {
-                selectPath = linkRoot.get("reference");
+                selectPath = linkRoot.get("referenceR");
             } else if (pathRoot != null) {
                 selectPath = pathRoot.get(pathTarget);
             } else {
@@ -402,9 +405,9 @@ public class FluentQuery {
 
         private void initLinkQuery() {
             linkRoot = cq.from(RecordLink.class);
-            Join<RecordLink, RecordWrapper> join = linkRoot.join("link");
+            //Join<RecordLink, RecordWrapper> join = linkRoot.join("link");
             //-- adding match and index filters
-            applyExtendedQuery(linkRoot, "reference", predicateList);
+            applyExtendedQuery(linkRoot, "referenceR", predicateList);
         }
 
         //----------------------------------------------------------------------
@@ -495,49 +498,49 @@ public class FluentQuery {
         //----------------------------------------------------------------------
         @Override
         public SortBuilder<T> aboveAny(Record... records) {
-            connectPath(false, false, "childR", "pathR", records);
+            connectPath(false, false, "child", "path", records);
             return this;
         }
 
         @Override
         public SortBuilder<T> belowAny(Record... records) {
-            connectPath(false, false, "pathR", "childR", records);
+            connectPath(false, false, "path", "child", records);
             return this;
         }
 
         @Override
         public SortBuilder<T> parentOfAny(Record... records) {
-            connectPath(true, false, "childR", "parentR", records);
+            connectPath(true, false, "child", "parent", records);
             return this;
         }
 
         @Override
         public SortBuilder<T> childOfAny(Record... records) {
-            connectPath(true, false, "parentR", "childR", records);
+            connectPath(true, false, "parent", "child", records);
             return this;
         }
 
         @Override
         public SortBuilder<T> above(Record... records) {
-            connectPath(false, true, "childR", "pathR", records);
+            connectPath(false, true, "child", "path", records);
             return this;
         }
 
         @Override
         public SortBuilder<T> below(Record... records) {
-            connectPath(false, true, "pathR", "childR", records);
+            connectPath(false, true, "path", "child", records);
             return this;
         }
 
         @Override
         public SortBuilder<T> parentOf(Record... records) {
-            connectPath(true, true, "childR", "parentR", records);
+            connectPath(true, true, "child", "parent", records);
             return this;
         }
 
         @Override
         public SortBuilder<T> childOf(Record... records) {
-            connectPath(true, true, "parentR", "childR", records);
+            connectPath(true, true, "parent", "child", records);
             return this;
         }
 
@@ -546,45 +549,45 @@ public class FluentQuery {
         //----------------------------------------------------------------------
         private <T> void connectPath(boolean limitPath, boolean and, String source, String target, Record... records) {
             pathRoot = cq.from(RecordPath.class);
-            Join<RecordPath, RecordWrapper> toJoin = pathRoot.join("pathR");
-            pathTarget = target;
-            //-- adding match and index filter
-            applyExtendedQuery(pathRoot, target, predicateList);
+            pathTarget = target+"R";
+            //Join<RecordPath, RecordWrapper> toJoin = pathRoot.join(pathTarget);
             //-- adding predicates
             if (and) {
                 connectAll(limitPath, RecordPath.class, pathRoot, source, target, records);
             } else {
                 connectAny(limitPath, pathRoot, source, records);
             }
+            //-- adding match and index filter
+            applyExtendedQuery(pathRoot, pathTarget, predicateList); // trick to pass from embedded key to child
         }
 
         private <T> void connectAll(boolean limitPath, Class<T> c, Root<T> root, String source, String target, Record... records) {
-            Path<Integer> id = root.get(source).get("id");
+            Path<Integer> id = root.get("recordPK").get(source);
             predicateList.add(cb.equal(id, records[0].getId()));
             if (limitPath) { // for asChild asParent
-                predicateList.add(cb.equal(root.get("pathR").get("id"), root.get("parentR").get("id")));
+                predicateList.add(cb.equal(root.get("recordPK").get("path"), root.get("recordPK").get("parent")));
             }
             //-- join
             for (int i = 1; i < records.length; i++) {
                 // from ..., RecordLink join[i]
                 Root<T> join = cq.from(c);
                 // where ... and join[i].link = :linkList[i]
-                predicateList.add(cb.equal(join.get(source).get("id"), records[i].getId()));
+                predicateList.add(cb.equal(join.get("recordPK").get(source), records[i].getId()));
                 // where ... and join[i].reference = root.reference
-                predicateList.add(cb.equal(join.get(target), root.get(target)));
+                predicateList.add(cb.equal(join.get("recordPK").get(target), root.get("recordPK").get(target)));
                 // limitPath
                 if (limitPath) { // for asChild asParent
-                    predicateList.add(cb.equal(join.get("pathR").get("id"), join.get("parentR").get("id")));
+                    predicateList.add(cb.equal(join.get("recordPK").get("path"), join.get("recordPK").get("parent")));
                 }
             }
         }
 
         private <T> void connectAny(boolean limitPath, Root<T> root, String source, Record... records) {
             Predicate[] ors = new Predicate[records.length];
-            Path<Integer> id = root.get(source).get("id");
+            Path<Integer> id = root.get("recordPK").get(source);
             for (int i = 0; i < records.length; i++) {
                 if (limitPath) { // for asChild asParent
-                    ors[i] = cb.and(cb.equal(id, records[i].getId()), cb.equal(root.get("pathR").get("id"), root.get("parentR").get("id")));
+                    ors[i] = cb.and(cb.equal(id, records[i].getId()), cb.equal(root.get("recordPK").get("path"), root.get("recordPK").get("parent")));
                 } else {
                     ors[i] = cb.equal(id, records[i].getId());
                 }
@@ -710,7 +713,7 @@ public class FluentQuery {
          * @param value value to compare to
          * @return Fluent Query
          */
-        ExtendedQuery<T> fieldEqualTo(String field, String value);
+        //ExtendedQuery<T> fieldEqualTo(String field, String value);
 
         /**
          * Filtering records based on field content matching any of the values.
@@ -720,7 +723,7 @@ public class FluentQuery {
          * @param values value to compare to
          * @return Fluent Query
          */
-        ExtendedQuery<T> fieldIn(String field, String... values);
+        //ExtendedQuery<T> fieldIn(String field, String... values);
 
         /**
          *

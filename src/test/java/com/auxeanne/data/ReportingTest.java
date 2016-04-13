@@ -150,7 +150,7 @@ public class ReportingTest {
 
     private ReportingWeek getReportWeek(Records records, String weekCode) {
         long start = System.currentTimeMillis();
-        ReportingWeek week = records.query(ReportingWeek.class).fieldEqualTo("week", weekCode).getFirst();
+        ReportingWeek week = records.query(ReportingWeek.class).indexEqualTo("week", weekCode).getFirst();
         long end = System.currentTimeMillis();
         System.out.println("   >>> Getting report week  " + weekCode + "  in " + (end - start) + "ms");
         if (week == null) {

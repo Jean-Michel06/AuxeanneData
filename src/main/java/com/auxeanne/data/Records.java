@@ -98,7 +98,8 @@ public class Records {
     /**
      * Setting the controller with : container managed entity manager and bean
      * managed transaction (BMT). Resource must be JTA. Typically used in JSF
-     * managed bean.
+     * managed bean. The object must be recreated for each transaction as the 
+     * entityùanager is closed.
      *
      * @param em entity manager
      * @param utx user transaction
@@ -112,9 +113,9 @@ public class Records {
      *
      * @param em entity manager
      */
-    //   public Records(EntityManager em) {
-    //       mc = new DatabaseController(em);
-    //   }
+       public Records(EntityManager em) {
+           mc = new DatabaseController(em);
+       }
     /**
      * Setting the controller with : bean managed entity and entity transaction.
      * Resource can be JTA or Local Resource. Typically used in Java SE or unit
@@ -194,11 +195,11 @@ public class Records {
                         // using reference as only SET is necesssary
                         RecordWrapper wrapper = mc.getTransactionEntityManager().getReference(RecordWrapper.class, recordId); // getReference creating two queries including RecordType
                         wrapper.setData(mc.toWrapper(record));
-                        if (record.isDocumentChanged()) {
-                            wrapper.setDocument(record.getDocument());
-                        }
+ ////                       if (record.isDocumentChanged()) {
+ ////                           wrapper.setDocument(record.getDocument());
+ ////                       }
                         indexRecord(false, record);
-                        auditor.logUpdateRecord(wrapper, record.isDocumentChanged());
+                        auditor.logUpdateRecord(wrapper, false); ////record.isDocumentChanged());
                     }
                 });
             });
@@ -336,7 +337,7 @@ public class Records {
             for (Object pkO : pkList1.next(100)) {
                 RecordLinkPK pk = (RecordLinkPK) pkO;
                 em.remove(em.getReference(RecordLink.class, pk));
-                auditor.logRemoveLink(pk.getReference_(), pk.getLink_());
+                auditor.logRemoveLink(pk.getReference(), pk.getLink());
             }
         }
         pkList1.close();
@@ -422,9 +423,9 @@ public class Records {
                 if (wrapper.getData() != null) {
                     cloneWrapper.setData(wrapper.getData());
                 }
-                if (wrapper.getDocument() != null) {
-                    cloneWrapper.setDocument(wrapper.getDocument());
-                }
+////                if (wrapper.getDocument() != null) {
+////                    cloneWrapper.setDocument(wrapper.getDocument());
+////                }
                 // performing database operations
                 mc.getTransactionEntityManager().persist(cloneWrapper);
                 T recordClone = mc.getRecord(recordClass, wrapper);
@@ -555,13 +556,13 @@ public class Records {
         RecordType recordType = mc.getType(record.getClass(), false);
         wrapper.setRecordType(recordType.getId());
         wrapper.setData(mc.toWrapper(record));
-        if (record.isDocumentChanged()) {
-            wrapper.setDocument(record.getDocument());
-        }
+////        if (record.isDocumentChanged()) {
+////            wrapper.setDocument(record.getDocument());
+////        }
         //-- tenant management
         Object tenant = mc.getTransactionEntityManager().getProperties().get(EntityManagerProperties.MULTITENANT_PROPERTY_DEFAULT);
         if (tenant != null) {
-            wrapper.setTenant(tenant.toString());
+           wrapper.setTenant(tenant.toString());
         }
         //-- getting the id from the JPA
         mc.getTransactionEntityManager().persist(wrapper);
@@ -579,10 +580,10 @@ public class Records {
     private void removePath(Long parentId, Long childId) {
         EntityManager em = mc.getTransactionEntityManager();
         //-- building branch to remove from below hierarchy >> using parent to use only this parent path if more than one exists
-        List<Long> pathList = em.createQuery("SELECT rp.recordPathPK.path FROM RecordPath rp WHERE rp.recordPathPK.child = :child").setParameter("child", parentId).getResultList();
+        List<Long> pathList = em.createQuery("SELECT rp.recordPK.path FROM RecordPath rp WHERE rp.recordPK.child = :child").setParameter("child", parentId).getResultList();
         pathList.add(parentId);
         //-- retrieving hierarchies to complete with new branch >> finding all children of reference
-        List<RecordPathPK> pkList = em.createQuery("SELECT rp.recordPathPK FROM RecordPath rp WHERE rp.recordPathPK.path = :path").setParameter("path", childId).getResultList();
+        List<RecordPathPK> pkList = em.createQuery("SELECT rp.recordPK FROM RecordPath rp WHERE rp.recordPK.path = :path").setParameter("path", childId).getResultList();
         pkList.add(new RecordPathPK(parentId, childId, parentId));
         //-- applying path branch to childrens
         for (RecordPathPK pk : pkList) {

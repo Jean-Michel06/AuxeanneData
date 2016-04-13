@@ -29,10 +29,10 @@ public abstract class AbstractRecord  implements Record, Serializable {
 
     @FieldExclusion
     private transient Long id;
-    @FieldExclusion
-    private transient byte[] document;
-    @FieldExclusion
-    private transient boolean documentChanged = false;
+    //@FieldExclusion
+    //private transient byte[] document;
+    //@FieldExclusion
+    //private transient boolean documentChanged = false;
 
     /**
      * get the id of the record if persisted or null
@@ -57,40 +57,40 @@ public abstract class AbstractRecord  implements Record, Serializable {
      * binary document stored in the database
      * @return the binary array
      */
-    @Override
-    public byte[] getDocument() {
-        return document;
-    }
+//    @Override
+//    public byte[] getDocument() {
+//        return document;
+//    }
 
     /**
      * Binary document stored in the database.
      * Flag isDocumentChanged is set to true.
      * @param document the binary array to store
      */
-    @Override
-    public void setDocument(byte[] document) {
-        this.document = document;
-        this.documentChanged = true;
-    }
+//    @Override
+//    public void setDocument(byte[] document) {
+//        this.document = document;
+//        this.documentChanged = true;
+//    }
 
     /**
      * flag to prevent unnecessary binary write in the database  
      * @return document change status
      */
-    @Override
-    public boolean isDocumentChanged() {
-        return documentChanged;
-    }
+//    @Override
+//    public boolean isDocumentChanged() {
+//        return documentChanged;
+//    }
 
     /**
      * Enable (true) or disable (false) the document write in the database.
      * This flag is set to true when using setter setDocument.
      * @param documentChanged new document status
      */
-    @Override
-    public void setDocumentChanged(boolean documentChanged) {
-        this.documentChanged = documentChanged;
-    }
+//    @Override
+//    public void setDocumentChanged(boolean documentChanged) {
+//        this.documentChanged = documentChanged;
+//    }
 
     @Override
     public int hashCode() {

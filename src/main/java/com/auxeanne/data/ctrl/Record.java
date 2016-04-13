@@ -26,12 +26,12 @@ public interface Record {
 
     void setId(Long recordId);
 
-    byte[] getDocument();
-
-    void setDocument(byte[] document);
-
-    boolean isDocumentChanged();
-
-    void setDocumentChanged(boolean documentChanged);
+//    byte[] getDocument();
+//
+//    void setDocument(byte[] document);
+//
+//    boolean isDocumentChanged();
+//
+//    void setDocumentChanged(boolean documentChanged);
 
 }

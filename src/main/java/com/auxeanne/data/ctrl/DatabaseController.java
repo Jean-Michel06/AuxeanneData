@@ -18,6 +18,8 @@ package com.auxeanne.data.ctrl;
 import com.auxeanne.data.db.RecordType;
 import com.auxeanne.data.db.RecordWrapper;
 import com.auxeanne.data.FieldIndexing;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.smile.SmileFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.lang.reflect.Field;
@@ -88,6 +90,8 @@ public class DatabaseController {
      * GSON Handler : using ISO 8601 date format
      */
     protected final Gson gson = new GsonBuilder().setExclusionStrategies(new RecordExclusionStrategy()).create();
+    //protected final SmileFactory f = new SmileFactory();
+    //protected final ObjectMapper jackson = new ObjectMapper(f);
 
     /**
      * managed entity manager
@@ -140,9 +144,11 @@ public class DatabaseController {
         this.utx = null;
         this.emf = null;
 
-        JpaEntityManager jem = JpaHelper.getEntityManager(em);
-        jem.getUnitOfWork().setShouldPerformDeletesFirst(true);
-        this.em = jem;
+        //-- wrong idea, the entitymanager is managed by the container and the wrapper will hold an obselete reference
+        //-- Delete first is forced when accessing the entity manager >> getTransactionEntityManager()
+        //JpaEntityManager jem = JpaHelper.getEntityManager(em);
+        //jem.getUnitOfWork().setShouldPerformDeletesFirst(true);
+        //this.em = jem;
     }
 
     /**
@@ -216,6 +222,13 @@ public class DatabaseController {
      * @return EntityManager
      */
     public EntityManager getTransactionEntityManager() {
+        // forcing delete first on container managed entity manager. Must we wrapped each time as container is the manager of the entity manager lifecycle
+        if (utx == null && emf == null) {
+            JpaEntityManager jem = JpaHelper.getEntityManager(em);
+            jem.getUnitOfWork().setShouldPerformDeletesFirst(true);
+            return em;
+        }
+        // factory managed
         if (em == null || (!em.isOpen() && emf != null)) {
             em = null;
             // EclipseLink magic for optimal behavior on model usage by forcing delete first
@@ -353,6 +366,7 @@ public class DatabaseController {
             } catch (SecurityException | IllegalStateException ex) {
                 // preventing database locking but still passing the exception
                 try {
+                    // IF ERROR HERE USING AN EJB AND AN EMF, REPLACE INJECTION BY AN EM ONLY
                     tx.rollback();
                 } catch (IllegalStateException | SecurityException ex1) {
                     Logger.getLogger(DatabaseController.class.getName()).log(Level.SEVERE, null, ex1);
@@ -382,8 +396,21 @@ public class DatabaseController {
      * @param modelClass Class to convert to
      * @return POJO
      */
-    public <T> T fromWrapper(String data, Class<T> modelClass) {
-        return gson.fromJson(data, modelClass);
+    public <T> T fromWrapper(byte[] data, Class<T> modelClass) {
+        try {return gson.fromJson(new String(data,"UTF-8"), modelClass);}
+        catch (Exception e) {
+            return null;
+        }
+        // return gson.fromJson(data, modelClass);
+        //return boon.fromJson(data, modelClass);
+        //return   boon.fromJson(data, modelClass);
+//        try {
+//            T result = jackson.readValue(data, modelClass);
+//            return result;
+//        } catch (Exception e) {
+//            return null;
+//        }
+
     }
 
     /**
@@ -393,8 +420,19 @@ public class DatabaseController {
      * @param model POJO to convert
      * @return JSON string
      */
-    public <T> String toWrapper(T model) {
-        return gson.toJson(model);
+    public <T> byte[] toWrapper(T model) {
+        try {return gson.toJson(model).getBytes("UTF-8");}
+        catch (Exception e) {
+            return null;
+        }
+        //return gson.toJson(model);
+        //return boon.writeValueAsBytes(model);
+        //return boon.writeValueAsString(model);
+//        try { 
+//            return jackson.writeValueAsBytes(model);
+//        } catch (Exception e) {
+//            return null;
+//        }
     }
 
     /**
@@ -406,11 +444,11 @@ public class DatabaseController {
      * @return POJO
      */
     public <T extends Record> T getRecord(Class<T> recordClass, RecordWrapper wrapper) {
-        String data = wrapper.getData();
+        byte[] data = wrapper.getData();
         T model = fromWrapper(data, recordClass);
         model.setId(wrapper.getId());
-        model.setDocument(wrapper.getDocument());
-        model.setDocumentChanged(false);
+////       model.setDocument(wrapper.getDocument());
+////       model.setDocumentChanged(false);
         return model;
     }
 
