@@ -217,10 +217,6 @@ public class FluentQuery {
             if (tenant != null) {
                 predicateList.add(cb.equal(wrapperRoot.get("tenant"), tenant.toString()));
             }
-            //-- pass on the query parameters
-            applyEqualQuery(wrapperRoot, predicateList);
-            applyIndexQuery(wrapperRoot, predicateList);
-            applySearchQuery(wrapperRoot, predicateList);
         }
 
         private void applyEqualQuery(Path recordPath, List<Predicate> predicateList) {
@@ -275,6 +271,10 @@ public class FluentQuery {
                 initRecordQuery();
                 selectPath = recordRoot;
             }
+               //-- pass on the query parameters
+            applyEqualQuery(selectPath, predicateList);
+            applyIndexQuery((From)selectPath, predicateList);
+            applySearchQuery(selectPath, predicateList);
             //-- DISTINCT is expensive, apply only when needed
             if (isDistinctRequired) {
                 cq.select(selectPath).distinct(true); // AboveAny / BelowAny multiple path results in multiple paths selection with same target which must be filteres y Distinct
@@ -337,6 +337,10 @@ public class FluentQuery {
                 initRecordQuery();
                 selectPath = recordRoot;
             }
+               //-- pass on the query parameters
+            applyEqualQuery(selectPath, predicateList);
+            applyIndexQuery((From)selectPath, predicateList); // ignore sorting for count
+            applySearchQuery(selectPath, predicateList);
             //-- DISTINCT is expensive, apply only when needed
             if (isDistinctRequired) {
                 cq.select(cb.countDistinct(selectPath)); // AboveAny / BelowAny multiple path results in multiple paths selection with same target which must be filteres y Distinct
@@ -691,6 +695,7 @@ public class FluentQuery {
          *
          * @param id database id
          * @return record from the database
+         * @throws java.lang.IllegalAccessException
          */
         T find(long id) throws IllegalAccessException;
 

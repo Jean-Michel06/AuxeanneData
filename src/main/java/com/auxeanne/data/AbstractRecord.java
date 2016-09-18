@@ -54,44 +54,9 @@ public abstract class AbstractRecord  implements Record, Serializable {
     }
 
     /**
-     * binary document stored in the database
-     * @return the binary array
+     * Hash code  of the item id
+     * @return 
      */
-//    @Override
-//    public byte[] getDocument() {
-//        return document;
-//    }
-
-    /**
-     * Binary document stored in the database.
-     * Flag isDocumentChanged is set to true.
-     * @param document the binary array to store
-     */
-//    @Override
-//    public void setDocument(byte[] document) {
-//        this.document = document;
-//        this.documentChanged = true;
-//    }
-
-    /**
-     * flag to prevent unnecessary binary write in the database  
-     * @return document change status
-     */
-//    @Override
-//    public boolean isDocumentChanged() {
-//        return documentChanged;
-//    }
-
-    /**
-     * Enable (true) or disable (false) the document write in the database.
-     * This flag is set to true when using setter setDocument.
-     * @param documentChanged new document status
-     */
-//    @Override
-//    public void setDocumentChanged(boolean documentChanged) {
-//        this.documentChanged = documentChanged;
-//    }
-
     @Override
     public int hashCode() {
         int hash = id.hashCode();

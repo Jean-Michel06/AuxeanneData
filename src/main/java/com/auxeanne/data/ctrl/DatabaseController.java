@@ -18,8 +18,6 @@ package com.auxeanne.data.ctrl;
 import com.auxeanne.data.db.RecordType;
 import com.auxeanne.data.db.RecordWrapper;
 import com.auxeanne.data.FieldIndexing;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.smile.SmileFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.lang.reflect.Field;
@@ -398,7 +396,7 @@ public class DatabaseController {
      */
     public <T> T fromWrapper(byte[] data, Class<T> modelClass) {
         try {return gson.fromJson(new String(data,"UTF-8"), modelClass);}
-        catch (Exception e) {
+        catch (Exception e) { 
             return null;
         }
         // return gson.fromJson(data, modelClass);

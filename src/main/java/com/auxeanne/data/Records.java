@@ -535,7 +535,7 @@ public class Records {
      * Spawn transaction to group multiple writing operations.
      * Otherwise a transaction is encapsulating each operation.
      *
-     * @param runnable
+     * @param runnable for Lambda 
      */
     public void transaction(Runnable runnable) {
         mc.transaction(runnable);
